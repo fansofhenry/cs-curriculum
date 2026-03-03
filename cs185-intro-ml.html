@@ -1,0 +1,1776 @@
+<!DOCTYPE html>
+<html lang="en" data-course="cs185">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CS 185 — Introduction to Machine Learning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,700;1,400&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #060b14;
+    --deep: #0c1525;
+    --surface: #111e33;
+    --lift: #162540;
+    --border: rgba(100,200,255,0.1);
+    --cyan: #4dd9f0;
+    --lime: #a3e635;
+    --amber: #fbbf24;
+    --rose: #f472b6;
+    --muted: rgba(200,220,255,0.45);
+    --text: rgba(220,235,255,0.92);
+    --mono: 'JetBrains Mono', monospace;
+    --display: 'Playfair Display', serif;
+    --sans: 'Space Grotesk', sans-serif;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--void);
+    color: var(--text);
+    font-family: var(--sans);
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* ── GRID BACKGROUND ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      linear-gradient(rgba(77,217,240,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(77,217,240,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* ── NOISE ── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 18px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(6,11,20,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-brand {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--cyan);
+    letter-spacing: 0.15em;
+  }
+  .nav-brand span { color: var(--muted); }
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 12px;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--cyan); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 120px 60px 80px;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  /* Gradient blob background */
+  .hero-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .blob-1 { width: 600px; height: 600px; background: rgba(77,217,240,0.06); top: -200px; right: -100px; }
+  .blob-2 { width: 400px; height: 400px; background: rgba(163,230,53,0.05); bottom: 0; left: 20%; }
+
+  .hero-inner {
+    position: relative;
+    z-index: 2;
+    max-width: 1100px;
+  }
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--cyan);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+  .hero-tag .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--cyan);
+    animation: blink 1.5s steps(1) infinite;
+  }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+  .hero-h1 {
+    font-family: var(--display);
+    font-size: clamp(52px, 7vw, 100px);
+    line-height: 0.95;
+    margin-bottom: 32px;
+    font-weight: 700;
+  }
+  .hero-h1 em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--cyan);
+  }
+
+  .hero-sub {
+    font-size: 17px;
+    color: var(--muted);
+    max-width: 580px;
+    line-height: 1.85;
+    font-weight: 300;
+    margin-bottom: 56px;
+  }
+
+  .hero-bar {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--border);
+    width: fit-content;
+  }
+  .hero-bar-item {
+    padding: 16px 28px;
+    border-right: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+  .hero-bar-item:last-child { border-right: none; }
+  .hero-bar-item strong { display: block; font-size: 22px; font-family: var(--sans); font-weight: 700; color: var(--text); margin-bottom: 2px; }
+  .hero-bar-item strong.cyan { color: var(--cyan); }
+  .hero-bar-item strong.lime { color: var(--lime); }
+  .hero-bar-item strong.amber { color: var(--amber); }
+
+  /* ── SCATTERED MATH ELEMENTS ── */
+  .math-float {
+    position: absolute;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: rgba(77,217,240,0.15);
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 1;
+  }
+
+  /* ── SECTION ── */
+  section { padding: 100px 60px; max-width: 1280px; margin: 0 auto; position: relative; z-index: 1; }
+  .section-line { border: none; border-top: 1px solid var(--border); margin: 0 60px; }
+
+  .overline {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .overline::before { content: '//'; color: rgba(77,217,240,0.4); }
+
+  h2 {
+    font-family: var(--display);
+    font-size: clamp(32px, 4vw, 56px);
+    line-height: 1.05;
+    margin-bottom: 20px;
+    font-weight: 700;
+  }
+  h2 em { font-style: italic; color: var(--cyan); font-weight: 400; }
+
+  .lead {
+    font-size: 16px;
+    line-height: 1.9;
+    color: var(--muted);
+    max-width: 700px;
+    font-weight: 300;
+    margin-bottom: 60px;
+  }
+
+  /* ── CORE DISTINCTION BOX ── */
+  .distinction {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    background: var(--border);
+    margin: 60px 0;
+  }
+  .dist-card {
+    background: var(--deep);
+    padding: 44px;
+  }
+  .dist-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+  .dist-icon.cyan-bg { background: rgba(77,217,240,0.1); }
+  .dist-icon.lime-bg { background: rgba(163,230,53,0.1); }
+  .dist-title {
+    font-family: var(--display);
+    font-size: 22px;
+    margin-bottom: 12px;
+  }
+  .dist-body { font-size: 14px; color: var(--muted); line-height: 1.8; }
+
+  /* ── PILLARS ── */
+  .pillars {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .pillar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 28px 24px;
+    transition: border-color 0.2s, transform 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .pillar::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .pillar:nth-child(1)::before { background: var(--cyan); }
+  .pillar:nth-child(2)::before { background: var(--lime); }
+  .pillar:nth-child(3)::before { background: var(--amber); }
+  .pillar:nth-child(4)::before { background: var(--rose); }
+  .pillar:hover { border-color: rgba(100,200,255,0.25); transform: translateY(-4px); }
+  .pillar-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    margin-bottom: 12px;
+  }
+  .pillar-title {
+    font-family: var(--display);
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  .pillar-body { font-size: 12.5px; color: var(--muted); line-height: 1.7; }
+
+  /* ── TRACKS ── */
+  .tracks-container { display: flex; flex-direction: column; gap: 2px; margin-top: 48px; }
+  .track {
+    background: var(--deep);
+    border: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 280px 1fr 1fr;
+    transition: border-color 0.2s;
+    overflow: hidden;
+  }
+  .track:hover { border-color: rgba(100,200,255,0.2); }
+  .track-sidebar {
+    padding: 36px 32px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .track-badge {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    display: inline-block;
+    margin-bottom: 14px;
+    width: fit-content;
+  }
+  .track-badge.cyan-badge { background: rgba(77,217,240,0.1); color: var(--cyan); border: 1px solid rgba(77,217,240,0.2); }
+  .track-badge.lime-badge { background: rgba(163,230,53,0.1); color: var(--lime); border: 1px solid rgba(163,230,53,0.2); }
+  .track-badge.amber-badge { background: rgba(251,191,36,0.1); color: var(--amber); border: 1px solid rgba(251,191,36,0.2); }
+  .track-name-big {
+    font-family: var(--display);
+    font-size: 26px;
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+  .track-tagline { font-size: 12px; color: var(--muted); font-style: italic; }
+  .track-main { padding: 36px 32px; border-right: 1px solid var(--border); }
+  .track-projects { padding: 36px 32px; }
+  .track-section-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .track-desc { font-size: 13.5px; color: var(--muted); line-height: 1.75; }
+  .proj-item {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(100,200,255,0.06);
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.5;
+    align-items: flex-start;
+  }
+  .proj-item:last-child { border-bottom: none; }
+  .proj-item .proj-num {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--cyan);
+    flex-shrink: 0;
+    margin-top: 2px;
+    opacity: 0.6;
+  }
+  .final-tag {
+    margin-top: 16px;
+    padding: 14px 16px;
+    font-size: 12px;
+    color: var(--muted);
+    font-family: var(--mono);
+    line-height: 1.6;
+  }
+  .track:nth-child(1) .final-tag { background: rgba(77,217,240,0.05); border-left: 2px solid var(--cyan); }
+  .track:nth-child(2) .final-tag { background: rgba(163,230,53,0.05); border-left: 2px solid var(--lime); }
+  .track:nth-child(3) .final-tag { background: rgba(251,191,36,0.05); border-left: 2px solid var(--amber); }
+
+  /* ── ML CONCEPTS SPIRAL ── */
+  .concepts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: var(--border);
+    margin-top: 48px;
+  }
+  .concept-block {
+    background: var(--deep);
+    padding: 32px 28px;
+    transition: background 0.2s;
+    cursor: default;
+  }
+  .concept-block:hover { background: var(--lift); }
+  .cb-num {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--cyan);
+    letter-spacing: 0.2em;
+    margin-bottom: 10px;
+    opacity: 0.7;
+  }
+  .cb-title {
+    font-family: var(--display);
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  .cb-formula {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--cyan);
+    opacity: 0.6;
+    margin-bottom: 10px;
+  }
+  .cb-body { font-size: 12px; color: var(--muted); line-height: 1.7; }
+
+  /* ── CALENDAR ── */
+  .cal-wrap {
+    border: 1px solid var(--border);
+    background: var(--deep);
+    margin-top: 48px;
+    overflow: hidden;
+  }
+  .cal-thead {
+    display: grid;
+    grid-template-columns: 60px 2fr 2fr 2fr;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .cal-th {
+    padding: 14px 20px;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-right: 1px solid var(--border);
+  }
+  .cal-th:last-child { border-right: none; }
+
+  .unit-divider {
+    padding: 9px 20px;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .unit-divider.cyan-div { background: rgba(77,217,240,0.04); color: var(--cyan); border-left: 3px solid var(--cyan); }
+  .unit-divider.lime-div { background: rgba(163,230,53,0.04); color: var(--lime); border-left: 3px solid var(--lime); }
+  .unit-divider.amber-div { background: rgba(251,191,36,0.04); color: var(--amber); border-left: 3px solid var(--amber); }
+  .unit-divider.rose-div { background: rgba(244,114,182,0.04); color: var(--rose); border-left: 3px solid var(--rose); }
+  .unit-divider.dark-div { background: rgba(255,255,255,0.02); color: var(--muted); }
+
+  .cal-row {
+    display: grid;
+    grid-template-columns: 60px 2fr 2fr 2fr;
+    border-bottom: 1px solid rgba(100,200,255,0.05);
+    transition: background 0.15s;
+  }
+  .cal-row:hover { background: rgba(77,217,240,0.02); }
+  .cal-row:last-child { border-bottom: none; }
+  .cal-wk {
+    padding: 18px 12px 18px 18px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 3px;
+    padding-top: 20px;
+  }
+  .wk-n {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--text);
+    line-height: 1;
+  }
+  .wk-s {
+    font-family: var(--mono);
+    font-size: 7px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .cal-cell {
+    padding: 18px 20px;
+    border-right: 1px solid rgba(100,200,255,0.06);
+    vertical-align: top;
+  }
+  .cal-cell:last-child { border-right: none; }
+  .c-title {
+    font-weight: 600;
+    font-size: 13.5px;
+    margin-bottom: 5px;
+    color: var(--text);
+  }
+  .c-body { font-size: 12px; color: var(--muted); line-height: 1.65; }
+  .tag-sm {
+    display: inline-block;
+    margin-top: 7px;
+    padding: 2px 8px;
+    font-family: var(--mono);
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    border-radius: 2px;
+  }
+  .t-found { background: rgba(77,217,240,0.1); color: var(--cyan); }
+  .t-proj { background: rgba(163,230,53,0.1); color: var(--lime); }
+  .t-crit { background: rgba(244,114,182,0.1); color: var(--rose); }
+  .t-math { background: rgba(251,191,36,0.1); color: var(--amber); }
+  .t-exhibit { background: rgba(255,255,255,0.08); color: var(--text); }
+
+  /* ── AMY KO INSIGHT CARDS ── */
+  .insights {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 48px;
+  }
+  .insight-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 28px 24px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .insight-card:hover { transform: translateY(-4px); border-color: rgba(77,217,240,0.25); }
+  .insight-card::after {
+    content: '"';
+    position: absolute;
+    bottom: -20px;
+    right: 16px;
+    font-size: 120px;
+    color: rgba(77,217,240,0.05);
+    font-family: Georgia;
+    line-height: 1;
+  }
+  .insight-source {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--cyan);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .insight-title {
+    font-family: var(--display);
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+  .insight-body { font-size: 12.5px; color: var(--muted); line-height: 1.75; }
+
+  /* ── UNGRADING / ASSESSMENT ── */
+  .assess-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2px;
+    background: var(--border);
+    margin-top: 48px;
+  }
+  .assess-card {
+    background: var(--deep);
+    padding: 40px 32px;
+  }
+  .assess-icon {
+    font-size: 28px;
+    margin-bottom: 14px;
+  }
+  .assess-title {
+    font-family: var(--display);
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+  .assess-body { font-size: 13px; color: var(--muted); line-height: 1.75; }
+  .assess-items {
+    margin-top: 14px;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .assess-items li {
+    font-size: 12px;
+    color: var(--muted);
+    padding-left: 14px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .assess-items li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--cyan);
+    font-size: 10px;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--deep);
+    border-top: 1px solid var(--border);
+    padding: 60px;
+    position: relative;
+    z-index: 1;
+  }
+  .footer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 48px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid var(--border);
+  }
+  .footer-brand {
+    font-family: var(--display);
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .footer-brand span { color: var(--cyan); font-style: italic; font-weight: 400; }
+  .footer-tagline {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 2;
+    margin-top: 10px;
+  }
+  .footer-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    max-width: 400px;
+  }
+  .footer-col h4 {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 12px;
+  }
+  .footer-col ul { list-style: none; }
+  .footer-col li {
+    font-size: 12px;
+    color: var(--muted);
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(100,200,255,0.05);
+  }
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: rgba(200,220,255,0.2);
+    letter-spacing: 0.1em;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .hero-tag { animation: fadeInUp 0.6s ease 0.1s both; }
+  .hero-h1 { animation: fadeInUp 0.7s ease 0.25s both; }
+  .hero-sub { animation: fadeInUp 0.7s ease 0.4s both; }
+  .hero-bar { animation: fadeInUp 0.7s ease 0.55s both; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1000px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    .hero { padding: 100px 24px 60px; }
+    section { padding: 60px 24px; }
+    .section-line { margin: 0 24px; }
+    .pillars { grid-template-columns: 1fr 1fr; }
+    .distinction { grid-template-columns: 1fr; }
+    .tracks-container .track { grid-template-columns: 1fr; }
+    .track-sidebar { border-right: none; border-bottom: 1px solid var(--border); }
+    .track-main { border-right: none; border-bottom: 1px solid var(--border); }
+    .concepts-grid { grid-template-columns: 1fr 1fr; }
+    .cal-thead, .cal-row { grid-template-columns: 50px 1fr; }
+    .cal-cell:nth-child(3), .cal-cell:nth-child(4),
+    .cal-th:nth-child(3), .cal-th:nth-child(4) { display: none; }
+    .insights { grid-template-columns: 1fr; }
+    .assess-grid { grid-template-columns: 1fr; }
+    footer { padding: 40px 24px; }
+    .footer-top { flex-direction: column; gap: 32px; }
+  }
+  @media (max-width: 600px) {
+    .pillars { grid-template-columns: 1fr; }
+    .hero-bar { flex-direction: column; }
+    .hero-bar-item { border-right: none; border-bottom: 1px solid var(--border); }
+    .concepts-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ═══ PROGRESS BAR ═════════════════════════════════ */
+  .progress-strip {
+    position: sticky; top: 0; z-index: 1000;
+    background: var(--deep); padding: 10px 48px;
+    display: flex; align-items: center; gap: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .progress-label { font-family: var(--mono); font-size: 10px;
+    letter-spacing:.12em; text-transform:uppercase; color: var(--muted); white-space:nowrap; }
+  #progress-text { font-family: var(--mono); font-size: 10px; color: rgba(200,220,255,.3); white-space:nowrap; }
+  .progress-track { flex:1; height:3px; background:rgba(77,217,240,.12); }
+  #progress-fill { height:100%; background: var(--cyan); width:0%; transition: width .4s ease; }
+  #active-track-label { font-family: var(--mono); font-size: 10px; color: var(--lime); letter-spacing:.1em; }
+
+  /* ═══ TRACK SELECTOR ═══════════════════════════════ */
+  .track-selector {
+    display: flex; gap:0; border:1px solid var(--border); margin-bottom:40px; flex-wrap:wrap;
+  }
+  .track-btn {
+    flex:1; padding:13px 18px; background:transparent; border:none; border-right:1px solid var(--border);
+    cursor:pointer; font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--muted); transition:all .2s; min-width:120px;
+  }
+  .track-btn:last-child { border-right:none; }
+  .track-btn:hover { background:var(--lift); color:var(--text); }
+  .track-btn.active { background:var(--surface); color:var(--cyan); border-bottom:2px solid var(--cyan); }
+  .track-btn:focus-visible { outline:2px solid var(--cyan); outline-offset:-2px; }
+
+  /* ═══ COMPLETE BUTTON ═══════════════════════════════ */
+  .complete-btn {
+    margin-top:12px; padding:7px 14px; background:transparent;
+    border:1px solid var(--border); cursor:pointer; font-family:var(--mono);
+    font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted);
+    transition:all .2s; display:block; width:100%;
+  }
+  .complete-btn:hover { border-color:var(--cyan); color:var(--cyan); }
+  .complete-btn.completed { background:rgba(77,217,240,.15); color:var(--cyan); border-color:var(--cyan); }
+
+  /* ═══ RECALL BOX ════════════════════════════════════ */
+  .recall-btn {
+    margin-top:8px; padding:5px 10px; background:transparent;
+    border:1px dashed rgba(251,191,36,.4); cursor:pointer; font-family:var(--mono);
+    font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--amber); transition:all .2s;
+  }
+  .recall-btn:hover { background:rgba(251,191,36,.06); }
+  .recall-box {
+    margin-top:10px; padding:14px 16px; background:rgba(251,191,36,.05);
+    border-left:2px solid var(--amber); font-size:12.5px;
+  }
+  .recall-box strong { font-family:var(--mono); font-size:9px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--amber); display:block; margin-bottom:8px; }
+  .recall-box ul { list-style:none; display:flex; flex-direction:column; gap:5px; }
+  .recall-box li { padding-left:12px; position:relative; line-height:1.55; color:var(--muted); font-size:12px; }
+  .recall-box li::before { content:'→'; position:absolute; left:0; color:var(--amber); font-family:var(--mono); }
+
+  /* ═══ HOW TO SUCCEED ════════════════════════════════ */
+  .succeed-section {
+    background:var(--deep); border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+    padding:64px 48px; position:relative;
+  }
+  .succeed-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:0; border:1px solid var(--border); margin-top:32px; }
+  .succeed-card { padding:28px; border-right:1px solid var(--border); transition:background .2s; }
+  .succeed-card:last-child { border-right:none; }
+  .succeed-card:hover { background:var(--lift); }
+  .succeed-num { font-family:var(--display); font-size:36px; line-height:1; color:var(--cyan); margin-bottom:8px; }
+  .succeed-title { font-family:var(--display); font-size:15px; margin-bottom:7px; font-style:italic; color:var(--text); }
+  .succeed-body { font-size:12px; line-height:1.75; color:var(--muted); }
+
+  /* ═══ CONCEPT MAP ════════════════════════════════════ */
+  .concept-map-section { padding:64px 48px; border-top:1px solid var(--border); position:relative; z-index:1; }
+  .concept-flows { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:20px; margin-top:32px; }
+  .concept-flow { border:1px solid var(--border); padding:22px; font-family:var(--mono);
+    font-size:11.5px; line-height:2; color:var(--muted); background:var(--deep); }
+  .concept-flow-label { font-size:9px; letter-spacing:.15em; text-transform:uppercase;
+    color:var(--cyan); margin-bottom:8px; }
+  .concept-flow .arrow { color:var(--lime); }
+
+  /* ═══ CAREER BOX ════════════════════════════════════ */
+  .career-box { margin-top:12px; padding:10px 12px; background:rgba(163,230,53,.05);
+    border-left:2px solid var(--lime); font-size:11.5px; }
+  .career-box strong { font-family:var(--mono); font-size:9px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--lime); display:block; margin-bottom:5px; }
+  .career-box ul { list-style:none; display:flex; flex-wrap:wrap; gap:5px; }
+  .career-box li { padding:2px 7px; background:rgba(163,230,53,.1); color:var(--lime); font-size:10.5px; }
+
+  /* ═══ BADGES ════════════════════════════════════════ */
+  .badges-section { padding:64px 48px; background:var(--deep); border-top:1px solid var(--border); position:relative; z-index:1; }
+  .badges-section h2 { font-family:var(--display); font-size:clamp(32px,4vw,52px); color:var(--text); margin-bottom:8px; }
+  .badges-section .lead { margin-bottom:32px; }
+  .badge-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0; border:1px solid var(--border); }
+  .badge-item { padding:30px; border-right:1px solid var(--border); transition:background .2s; position:relative; }
+  .badge-item:last-child { border-right:none; }
+  .badge-item:hover { background:var(--lift); }
+  .badge-icon { font-size:32px; margin-bottom:10px; display:block; }
+  .badge-name { font-family:var(--display); font-size:18px; font-style:italic; margin-bottom:5px; color:var(--text); }
+  .badge-status { font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+  .badge-item.badge-earned .badge-status { color:var(--amber); }
+  .badge-item.badge-earned::after { content:'✓'; position:absolute; right:18px; top:18px; font-size:22px; color:var(--amber); }
+
+  /* ═══ DATASETS ══════════════════════════════════════ */
+  .datasets-section { padding:64px 48px; border-top:1px solid var(--border); position:relative; z-index:1; }
+  .dataset-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:0; border:1px solid var(--border); margin-top:32px; }
+  .dataset-item { padding:22px; border-right:1px solid var(--border); transition:background .2s; }
+  .dataset-item:last-child { border-right:none; }
+  .dataset-item:hover { background:var(--lift); }
+  .dataset-name { font-family:var(--display); font-size:15px; font-style:italic; margin-bottom:4px; color:var(--text); }
+  .dataset-desc { font-size:12px; color:var(--muted); line-height:1.6; margin-bottom:10px; }
+  .dataset-link { font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--cyan); text-decoration:none; border-bottom:1px solid rgba(77,217,240,.3); }
+  .dataset-link:hover { color:var(--lime); border-color:rgba(163,230,53,.4); }
+
+</style>
+</head>
+<body>
+
+<div class="progress-strip" role="status" aria-label="Course progress">
+  <span class="progress-label">Progress</span>
+  <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+    <div id="progress-fill"></div>
+  </div>
+  <span id="progress-text">0 of 9 units completed</span>
+  <span style="color:var(--border);margin:0 8px">|</span>
+  <span class="progress-label">Track:</span>
+  <span id="active-track-label">All Tracks</span>
+</div>
+
+
+<!-- Floating math elements -->
+<div class="math-float" style="top:18%;left:4%;">θ := θ - α∇J(θ)</div>
+<div class="math-float" style="top:35%;right:3%;">P(y|x) = σ(wᵀx + b)</div>
+<div class="math-float" style="top:55%;left:2%;">J(θ) = -Σ[y·log(ŷ)]</div>
+<div class="math-float" style="top:72%;right:4%;">K(x,x') = exp(-‖x-x'‖²/2σ²)</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">CS <span>185</span> // intro to machine learning</div>
+  <ul class="nav-links">
+    <li><a href="#foundations">Foundations</a></li>
+    <li><a href="#tracks">Tracks</a></li>
+    <li><a href="#concepts">Core Concepts</a></li>
+    <li><a href="#calendar">Calendar</a></li>
+    <li><a href="#assessment">Portfolio</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-blob blob-1"></div>
+  <div class="hero-blob blob-2"></div>
+  <div class="hero-inner">
+    <div class="hero-tag">
+      <span class="dot"></span>
+      CS 185 · 3 Units · Foothill / West Valley College · 18 Weeks
+    </div>
+    <h1 class="hero-h1">
+      Intro to<br>
+      <em>Machine</em><br>
+      Learning
+    </h1>
+    <p class="hero-sub">
+      Every machine learning algorithm is a bet — a set of assumptions about structure hidden in data. We learn to make those bets consciously, derive them mathematically, and ask who bears the cost when they're wrong.
+    </p>
+    <div class="hero-bar">
+      <div class="hero-bar-item">
+        <strong class="cyan">18</strong>
+        weeks of depth
+      </div>
+      <div class="hero-bar-item">
+        <strong class="lime">3</strong>
+        adventure tracks
+      </div>
+      <div class="hero-bar-item">
+        <strong class="amber">0</strong>
+        exams, all projects
+      </div>
+      <div class="hero-bar-item">
+        <strong>∇</strong>
+        first principles first
+      </div>
+      <div class="hero-bar-item">
+        <strong>✊</strong>
+        liberatory pedagogy
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOUNDATIONS -->
+<hr class="section-line">
+<section id="foundations">
+  <div class="overline">Our Foundation</div>
+  <h2>ML Isn't Neutral.<br><em>Neither Is This Course.</em></h2>
+  <p class="lead">
+    Machine learning algorithms are not mathematical facts of nature. They are choices — choices about what to optimize, what to measure, whose data counts. We learn the math and the politics simultaneously. You cannot do one without the other.
+  </p>
+
+  <div class="distinction">
+    <div class="dist-card">
+      <div class="dist-icon cyan-bg">⚙️</div>
+      <div class="dist-title">Most ML Courses Teach You This</div>
+      <p class="dist-body">Import sklearn. Call <code style="font-family:var(--mono);font-size:12px;color:var(--cyan);">.fit()</code>. Get accuracy. Submit homework. Graduate. Never understand what the library is actually doing. Never ask who designed these defaults and why.</p>
+    </div>
+    <div class="dist-card">
+      <div class="dist-icon lime-bg">🌱</div>
+      <div class="dist-title">This Course Teaches You This</div>
+      <p class="dist-body">Derive the loss function. Implement the gradient update from scratch. Then use the library knowing what it's doing. Then ask: what are the assumptions baked into this algorithm, who does it serve when it's right, and who does it harm when it's wrong?</p>
+    </div>
+  </div>
+
+  <div class="pillars">
+    <div class="pillar">
+      <div class="pillar-num">// 01</div>
+      <div class="pillar-title">Root Before Branch</div>
+      <p class="pillar-body">You implement linear regression before you touch scikit-learn. You derive backprop before PyTorch. Amy Ko's research: reading before writing creates more robust, transferable learning.</p>
+    </div>
+    <div class="pillar">
+      <div class="pillar-num">// 02</div>
+      <div class="pillar-title">Choose Your Depth</div>
+      <p class="pillar-body">Three tracks share core concepts, diverge on depth. Novice: visual intuition + Colab notebooks. Builder: NumPy implementations. Architect: full mathematical derivations + research papers.</p>
+    </div>
+    <div class="pillar">
+      <div class="pillar-num">// 03</div>
+      <div class="pillar-title">Uncertainty Is the Lesson</div>
+      <p class="pillar-body">Amy Ko: "Understanding ML means understanding uncertainty." Every model is uncertain. Every prediction has a confidence interval. We learn to communicate uncertainty, not pretend it doesn't exist.</p>
+    </div>
+    <div class="pillar">
+      <div class="pillar-num">// 04</div>
+      <div class="pillar-title">No Portfolio, No Grade</div>
+      <p class="pillar-body">Adapted from Jeff Anderson's ungrading practice: you assign your final grade with evidence from your portfolio. Grades are tools for self-assessment, not performance metrics for the instructor's comfort.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- TRACK SELECTOR -->
+<div style="max-width:1280px;margin:0 auto;padding:0 48px;">
+  <div class="track-selector" role="group" aria-label="Choose learning track">
+    <button class="track-btn active" data-track="all" onclick="setTrack('all')" aria-pressed="true">☰ All Tracks</button>
+    <button class="track-btn" data-track="n" onclick="setTrack('n')" aria-pressed="false">🌱 Data Explorer</button>
+    <button class="track-btn" data-track="b" onclick="setTrack('b')" aria-pressed="false">🔨 The Implementer</button>
+    <button class="track-btn" data-track="a" onclick="setTrack('a')" aria-pressed="false">🔬 The Theorist</button>
+  </div>
+</div>
+
+<!-- TRACKS -->
+<hr class="section-line">
+<section id="tracks">
+  <div class="overline">Choose Your Adventure</div>
+  <h2>Three Tracks.<br><em>One Truth.</em></h2>
+  <p class="lead">
+    All three tracks cover the same core ML concepts every week. They diverge on project depth, mathematical rigor, and tooling. You self-select your track. You can move up at any point. Jeff Anderson's rule applies: spend as much time as possible at the edge of your productive struggle.
+  </p>
+
+  <div class="tracks-container">
+    <div class="track">
+      <div class="track-sidebar">
+        <div>
+          <div class="track-badge cyan-badge">Track I · Novice</div>
+          <div class="track-name-big">The Data<br>Explorer</div>
+          <div class="track-tagline">"You have questions about the world. Data has answers. Let's find them."</div>
+        </div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:24px;">
+          Prerequisites: Basic Python<br>
+          Tools: Colab, Pandas, sklearn<br>
+          Math: Algebra + Intuition
+        </div>
+      </div>
+      <div class="track-main">
+        <div class="track-section-label">// What You'll Do</div>
+        <p class="track-desc">You'll use real-world datasets that connect to issues you care about — community health, education, housing, music. You'll learn each algorithm through a concrete problem, visualizing what the model is learning before writing a line of sklearn. Amy Ko's principle: read and understand before you write and execute.</p>
+        <div class="final-tag">
+          🎯 Final: A data story — pick a public dataset, run a full ML analysis, write a plain-language report for your community explaining what you found, what the model can't see, and what people should know.
+        </div>
+      </div>
+      <div class="track-projects">
+        <div class="track-section-label">// Key Projects</div>
+        <div class="proj-item"><span class="proj-num">P1</span><span>Housing Price Predictor: linear regression on local Zillow data. Visual gradient descent before one line of sklearn.</span></div>
+        <div class="proj-item"><span class="proj-num">P2</span><span>Heart Disease Classifier: logistic regression. Precision/recall tradeoffs. When is false positive worse than false negative?</span></div>
+        <div class="proj-item"><span class="proj-num">P3</span><span>Spotify Genre Clusterer: K-means on audio features. Does the algorithm agree with your ears?</span></div>
+        <div class="proj-item"><span class="proj-num">P4</span><span>Movie Sentiment Analyzer: Naive Bayes on reviews. Test on reviews from your own cultural context.</span></div>
+        <div class="proj-item"><span class="proj-num">P5</span><span>Midterm: Bias Audit — pick a public ML model, document 5 failure modes, propose a technically grounded fix.</span></div>
+      </div>
+    </div>
+
+    <div class="track">
+      <div class="track-sidebar">
+        <div>
+          <div class="track-badge lime-badge">Track II · Builder</div>
+          <div class="track-name-big">The<br>Implementer</div>
+          <div class="track-tagline">"You know Python. Now build the algorithms from the ground up."</div>
+        </div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:24px;">
+          Prerequisites: Python + some math<br>
+          Tools: NumPy, Pandas, sklearn<br>
+          Math: Calculus + Linear Algebra
+        </div>
+      </div>
+      <div class="track-main">
+        <div class="track-section-label">// What You'll Do</div>
+        <p class="track-desc">You implement every algorithm from scratch before using the library version. The rule is immutable: you cannot call <code style="font-family:var(--mono);font-size:11px;color:var(--lime);">sklearn.linear_model.LinearRegression()</code> until your NumPy version passes unit tests. You'll see the abstraction layer and understand exactly what it's hiding.</p>
+        <div class="final-tag">
+          🎯 Final: A full ML pipeline — problem framing, data cleaning, feature engineering, 3+ model comparison, bias evaluation, and a written practitioner brief explaining your choices and their societal implications.
+        </div>
+      </div>
+      <div class="track-projects">
+        <div class="track-section-label">// Key Projects</div>
+        <div class="proj-item"><span class="proj-num">P1</span><span>Linear Regression from scratch: MSE loss, gradient descent, NumPy matrix ops. Must match sklearn within 0.001.</span></div>
+        <div class="proj-item"><span class="proj-num">P2</span><span>Logistic Regression + SGD: binary cross-entropy, mini-batch updates, learning rate schedule.</span></div>
+        <div class="proj-item"><span class="proj-num">P3</span><span>Decision Tree from scratch: information gain, CART algorithm, depth-limited pruning.</span></div>
+        <div class="proj-item"><span class="proj-num">P4</span><span>Neural Network: 3-layer MLP, backprop in NumPy, trained on tabular real-world data.</span></div>
+        <div class="proj-item"><span class="proj-num">P5</span><span>Midterm: Kaggle competition — custom pipeline only. No AutoML. Document every decision.</span></div>
+      </div>
+    </div>
+
+    <div class="track">
+      <div class="track-sidebar">
+        <div>
+          <div class="track-badge amber-badge">Track III · Architect</div>
+          <div class="track-name-big">The<br>Theorist</div>
+          <div class="track-tagline">"You want the proofs, the edge cases, and the open research questions."</div>
+        </div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:24px;">
+          Prerequisites: Calc, Lin Alg, Stats<br>
+          Tools: NumPy, PyTorch, LaTeX<br>
+          Math: Real Analysis + Probability
+        </div>
+      </div>
+      <div class="track-main">
+        <div class="track-section-label">// What You'll Do</div>
+        <p class="track-desc">You engage with the mathematical foundations directly. Proofs, derivations, and published research papers are the currency. You'll implement autograd, understand PAC learning theory, and engage critically with current research on fairness and robustness. Amy Ko: "studying computing requires human-centered methods — even for theory."</p>
+        <div class="final-tag">
+          🎯 Final: A research-grade project — novel research question, literature review, implementation, experiments, and a preprint-style write-up with critical analysis of limitations and societal implications.
+        </div>
+      </div>
+      <div class="track-projects">
+        <div class="track-section-label">// Key Projects</div>
+        <div class="proj-item"><span class="proj-num">P1</span><span>Derive MLE from first principles for Gaussian, Bernoulli, and multinomial distributions.</span></div>
+        <div class="proj-item"><span class="proj-num">P2</span><span>Prove gradient descent convergence for L-smooth, μ-strongly convex functions. Implement and verify empirically.</span></div>
+        <div class="proj-item"><span class="proj-num">P3</span><span>Implement mini-autograd (like Karpathy's micrograd). Extend to support arbitrary compute graphs.</span></div>
+        <div class="proj-item"><span class="proj-num">P4</span><span>Kernel methods: derive SVM dual, implement kernel trick, analyze RKHS properties.</span></div>
+        <div class="proj-item"><span class="proj-num">P5</span><span>Midterm: Paper replication — replicate a fairness-in-ML result from NeurIPS/ICML. Document every gap between paper and reality.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CORE CONCEPTS -->
+<hr class="section-line">
+<section id="concepts">
+  <div class="overline">Core Concepts</div>
+  <h2>The ML Stack —<br><em>From the Root Up</em></h2>
+  <p class="lead">
+    These are the foundational concepts we master across all 18 weeks. Every algorithm we study is a variation on these themes. If you understand these deeply, you can learn any new ML technique in days.
+  </p>
+
+  <div class="concepts-grid">
+    <div class="concept-block">
+      <div class="cb-num">// 01</div>
+      <div class="cb-title">Loss Functions</div>
+      <div class="cb-formula">J(θ) = (1/n)Σᵢ ℒ(yᵢ, f(xᵢ;θ))</div>
+      <p class="cb-body">Every learning algorithm is an optimization problem. The loss function is the compass. We study MSE, cross-entropy, hinge loss — not as recipes but as choices that encode assumptions about the world.</p>
+    </div>
+    <div class="concept-block">
+      <div class="cb-num">// 02</div>
+      <div class="cb-title">Gradient Descent</div>
+      <div class="cb-formula">θ := θ - α · ∇J(θ)</div>
+      <p class="cb-body">The engine of learning. From batch to stochastic to mini-batch. Convergence guarantees. Adaptive methods. We build intuition first, then rigor. You'll understand why Adam works before you use it.</p>
+    </div>
+    <div class="concept-block">
+      <div class="cb-num">// 03</div>
+      <div class="cb-title">Bias-Variance Tradeoff</div>
+      <div class="cb-formula">E[L] = Bias² + Variance + σ²</div>
+      <p class="cb-body">The central tension of all statistical learning. Underfitting, overfitting, regularization. Understanding why regularization works is more valuable than knowing how to call it.</p>
+    </div>
+    <div class="concept-block">
+      <div class="cb-num">// 04</div>
+      <div class="cb-title">Maximum Likelihood</div>
+      <div class="cb-formula">θ̂_MLE = argmax P(data | θ)</div>
+      <p class="cb-body">Why do we minimize MSE for regression and cross-entropy for classification? Because they're the same thing: maximum likelihood estimation under different distributional assumptions. This unifies everything.</p>
+    </div>
+    <div class="concept-block">
+      <div class="cb-num">// 05</div>
+      <div class="cb-title">Probabilistic Thinking</div>
+      <div class="cb-formula">P(y|x) = P(x|y)·P(y) / P(x)</div>
+      <p class="cb-body">All of ML is probability. Bayes, conditional independence, the generative vs. discriminative distinction. Ko: "understanding ML means understanding uncertainty." We make uncertainty visible, not hidden.</p>
+    </div>
+    <div class="concept-block">
+      <div class="cb-num">// 06</div>
+      <div class="cb-title">Feature Engineering</div>
+      <div class="cb-formula">φ: x → ℝᵈ (good representation)</div>
+      <p class="cb-body">Often the highest-leverage skill in applied ML. What you feed the model matters more than which model you choose. And what features exist in a dataset encodes who was worth measuring.</p>
+    </div>
+    <div class="concept-block">
+      <div class="cb-num">// 07</div>
+      <div class="cb-title">Model Evaluation</div>
+      <div class="cb-formula">CV Risk = (1/k)Σ ℒ(f̂₋ₛ, Dₛ)</div>
+      <p class="cb-body">Accuracy is a lie when classes are imbalanced. We study precision, recall, AUC, calibration, and fairness metrics — understanding why they conflict mathematically and ethically.</p>
+    </div>
+    <div class="concept-block">
+      <div class="cb-num">// 08</div>
+      <div class="cb-title">Neural Networks</div>
+      <div class="cb-formula">h = σ(Wₗ·...·σ(W₁x + b₁) + bₗ)</div>
+      <p class="cb-body">Universal approximation, but at a cost. Backpropagation, activation functions, architectures. We implement from scratch before PyTorch. The abstraction is earned, not given.</p>
+    </div>
+    <div class="concept-block">
+      <div class="cb-num">// 09</div>
+      <div class="cb-title">Algorithmic Fairness</div>
+      <div class="cb-formula">P(ŷ=1|A=0) ≠ P(ŷ=1|A=1)</div>
+      <p class="cb-body">Fairness is not one thing — it's a family of mathematical definitions that are mutually incompatible. Understanding why they conflict is the most important result in the course. There is no free lunch, ethically or mathematically.</p>
+    </div>
+  </div>
+</section>
+
+<!-- AMY KO INSIGHTS -->
+<hr class="section-line">
+<section>
+  <div class="overline">Research-Grounded Pedagogy</div>
+  <h2>What the Research<br><em>Actually Says</em></h2>
+  <p class="lead">
+    This course is designed in direct conversation with Dr. Amy Ko's 25 years of computing education research and Jeff Anderson's classroom practice. Every pedagogical choice has a justification.
+  </p>
+
+  <div class="insights">
+    <div class="insight-card">
+      <div class="insight-source">Amy Ko Research</div>
+      <div class="insight-title">Read Before You Write</div>
+      <p class="insight-body">Ko's research shows that teaching program reading before program writing creates more robust understanding. We apply this to ML: you analyze, trace, and critique existing algorithms before implementing them. Understanding precedes production.</p>
+    </div>
+    <div class="insight-card">
+      <div class="insight-source">Amy Ko Research</div>
+      <div class="insight-title">CS Assessments Aren't Fair</div>
+      <p class="insight-body">Ko's work using psychometrics to study CS assessments found they often disadvantage students not because of knowledge gaps but because of assessment design. Portfolio + ungrading sidesteps this entirely — your evidence speaks, not your performance under pressure.</p>
+    </div>
+    <div class="insight-card">
+      <div class="insight-source">Amy Ko Research</div>
+      <div class="insight-title">Scaffolded Struggle Works</div>
+      <p class="insight-body">Ko's Gidget research: framing challenges as authentic practice (not failure) keeps learners engaged with deliberate, step-by-step process. Our "2-minute question rule" and tiered project scaffolding are direct applications of this finding.</p>
+    </div>
+    <div class="insight-card">
+      <div class="insight-source">Jeff Anderson</div>
+      <div class="insight-title">Conquering College</div>
+      <p class="insight-body">Jeff Anderson's framework for first-generation students: the meta-skills of college — how to ask for help, form study groups, manage time, communicate with instructors — are taught explicitly, not assumed. This is part of our curriculum.</p>
+    </div>
+    <div class="insight-card">
+      <div class="insight-source">Jeff Anderson</div>
+      <div class="insight-title">Deep Learning vs. Surface</div>
+      <p class="insight-body">Anderson distinguishes deep learning (understanding that transfers) from surface learning (passing the test). Every course design choice — first principles, projects over exams, portfolio over grades — is oriented toward deep learning that serves you in 10 years.</p>
+    </div>
+    <div class="insight-card">
+      <div class="insight-source">Freire + Ko</div>
+      <div class="insight-title">Justice-Focused CS Requires Agency</div>
+      <p class="insight-body">Ko's research found justice-focused CS education is empowering but requires student trust and agency. We build that trust through transparent course design, flexible deadlines, and making the power dynamics of the classroom explicit. You are a co-creator, not a consumer.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 18-WEEK CALENDAR -->
+<hr class="section-line">
+<section id="calendar">
+  <div class="overline">18-Week Calendar</div>
+  <h2>The Journey,<br><em>Week by Week</em></h2>
+  <p class="lead">
+    We begin with the statistical foundations that unify all of ML — probability, distributions, estimation. We build upward through supervised, unsupervised, and deep learning. We end with the open problems: fairness, robustness, and alignment.
+  </p>
+
+  <div class="cal-wrap">
+    <div class="cal-thead">
+      <div class="cal-th">Wk</div>
+      <div class="cal-th">Theme & Question</div>
+      <div class="cal-th">Core Concepts + Math</div>
+      <div class="cal-th">Lab / Project</div>
+    </div>
+
+    <!-- UNIT 1: STATISTICAL FOUNDATIONS -->
+    <div class="unit-divider cyan-div">Unit 1 — Statistical Foundations: Probability, Estimation, Loss</div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-n">01</span><span class="wk-s">Unit 1</span></div>
+      <div class="cal-cell">
+        <div class="c-title">What Is Learning From Data?</div>
+        <div class="c-body">The ML frame: inputs, outputs, loss, optimization. How does this differ from programming? Why is statistical learning hard?</div>
+        <span class="tag-sm t-found">Foundational</span>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Probability Review + MLE Intro</div>
+        <div class="c-body">Random variables, expectations, variance. MLE as a principle: find parameters that maximize probability of observed data. Gaussian MLE derived.</div>
+        <span class="tag-sm t-math">Math Root</span>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Lab: Fit a Gaussian by Hand</div>
+        <div class="c-body">Derive μ and σ² from MLE. Then use NumPy. Verify they match. Novice: visual interactive. Architect: full derivation with regularity conditions.</div>
+        <span class="tag-sm t-proj">Project</span>
+      </div>
+    </div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-n">02</span><span class="wk-s">Unit 1</span></div>
+      <div class="cal-cell">
+        <div class="c-title">Supervised Learning Setup</div>
+        <div class="c-body">Training set, test set, generalization. The fundamental question: why does training performance predict test performance? Introduce the i.i.d. assumption — and when it breaks.</div>
+        <span class="tag-sm t-found">Foundational</span>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Loss Functions as Probabilistic Choices</div>
+        <div class="c-body">MSE = MLE under Gaussian noise. Cross-entropy = MLE under Bernoulli. This is the unifying theorem. Understand it and every supervised algorithm makes sense.</div>
+        <span class="tag-sm t-math">Math Root</span>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Lab: Loss Landscape Explorer</div>
+        <div class="c-body">Visualize MSE and cross-entropy surfaces. Understand what "minimizing" means geometrically. Then: whose data was used to train a real model you interact with daily?</div>
+        <span class="tag-sm t-crit">Critical</span>
+      </div>
+    </div>
+
+    <!-- UNIT 2: LINEAR METHODS -->
+    <div class="unit-divider lime-div">Unit 2 — Linear Methods: Regression, Classification, Regularization</div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-n">03</span><span class="wk-s">Unit 2</span></div>
+      <div class="cal-cell">
+        <div class="c-title">Linear Regression: The Foundation</div>
+        <div class="c-body">The model: ŷ = wᵀx + b. MSE loss. Gradient derivation. Analytical solution (normal equations). The line between "fitting" and "overfitting." This is the root of all ML.</div>
+        <span class="tag-sm t-found">Foundational</span>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Gradient Descent Deep Dive</div>
+        <div class="c-body">Batch GD, SGD, mini-batch. Learning rate sensitivity. Convergence conditions. Novice: interactive visualizer. Builder: full NumPy SGD. Architect: prove convergence for L-smooth functions.</div>
+        <span class="tag-sm t-math">Math Root</span>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Project: Rent Predictor</div>
+        <div class="c-body">Predict Bay Area housing prices. From scratch before sklearn. Then: what variables does the model rely on? What does it encode about whose neighborhoods matter?</div>
+        <span class="tag-sm t-crit">Critical</span>
+      </div>
+    </div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-n">04</span><span class="wk-s">Unit 2</span></div>
+      <div class="cal-cell">
+        <div class="c-title">Regularization: Bias vs. Variance</div>
+        <div class="c-body">Ridge (L2) and Lasso (L1) as Bayesian priors. The bias-variance decomposition. Why more complex models aren't always better. Cross-validation as honest evaluation.</div>
+        <span class="tag-sm t-found">Foundational</span>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Logistic Regression + Sigmoid</div>
+        <div class="c-body">From regression to binary classification. The sigmoid function. Binary cross-entropy loss. Decision boundaries as hyperplanes. What does the model think the "boundary" means?</div>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Lab: What Does "Accurate" Mean?</div>
+        <div class="c-body">Precision, recall, F1, AUC-ROC, confusion matrix. Analyze a hiring classifier. Document where false positives vs. false negatives hit harder — and who bears the cost.</div>
+        <span class="tag-sm t-crit">Critical</span>
+      </div>
+    </div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-n">05</span><span class="wk-s">Unit 2</span></div>
+      <div class="cal-cell">
+        <div class="c-title">Naive Bayes + Generative Models</div>
+        <div class="c-body">The generative vs. discriminative distinction. Naive Bayes: where the "naive" assumption is, when it works, and when it catastrophically fails. Text classification.</div>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Feature Engineering</div>
+        <div class="c-body">Encoding categorical variables. Polynomial features. Normalization. The choices embedded in feature engineering. What gets measured, and why, encodes power.</div>
+        <span class="tag-sm t-crit">Critical</span>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Project: Spam/Sentiment Classifier</div>
+        <div class="c-body">Build Naive Bayes text classifier. Test on text from your own cultural context (AAVE, Spanish, code-switching). Document failures. Propose a data collection fix.</div>
+        <span class="tag-sm t-proj">Project</span>
+      </div>
+    </div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-n">06</span><span class="wk-s">Unit 2</span></div>
+      <div class="cal-cell">
+        <div class="c-title">Decision Trees + Ensembles</div>
+        <div class="c-body">Information gain, CART. Random forests as variance reduction. Gradient boosting as sequential error correction. Interpretability vs. performance tension.</div>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Model Selection + Pipelines</div>
+        <div class="c-body">Hyperparameter tuning. Grid search. The multiple comparisons problem. Why your cross-validated results are probably still too optimistic.</div>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Lab: Recidivism Prediction Audit</div>
+        <div class="c-body">Analyze COMPAS-style decision tree on ProPublica data. Compute accuracy by race. Discuss: why do different fairness definitions conflict mathematically? What should policy do?</div>
+        <span class="tag-sm t-crit">Critical</span>
+      </div>
+    </div>
+
+    <!-- UNIT 3: UNSUPERVISED -->
+    <div class="unit-divider amber-div">Unit 3 — Unsupervised Learning: Clustering, Dimensionality, Representation</div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-n">07</span><span class="wk-s">Unit 3</span></div>
+      <div class="cal-cell">
+        <div class="c-title">Learning Without Labels</div>
+        <div class="c-body">Why is unsupervised learning harder to evaluate? K-means: Lloyd's algorithm, convergence, choosing k. The Elbow Method. What does it mean for the algorithm to "decide" what's similar?</div>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Gaussian Mixture Models</div>
+        <div class="c-body">Soft clustering. The EM algorithm as alternating optimization. K-means is a special case of GMM. Novice: visual. Builder: implement EM. Architect: derive ELBO.</div>
+        <span class="tag-sm t-math">Math Root</span>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Lab: Market Segmentation</div>
+        <div class="c-body">K-means on customer behavior data. Compare algorithm clusters to demographic patterns. Discuss: when does "segment" become "discriminate"?</div>
+        <span class="tag-sm t-crit">Critical</span>
+      </div>
+    </div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-n">08</span><span class="wk-s">Unit 3</span></div>
+      <div class="cal-cell">
+        <div class="c-title">PCA + Dimensionality Reduction</div>
+        <div class="c-body">The curse of dimensionality. PCA as variance maximization and as finding the data's "natural axes." SVD connection. What information is lost in compression?</div>
+        <span class="tag-sm t-found">Foundational</span>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Word Embeddings + Representation</div>
+        <div class="c-body">word2vec, GloVe — geometry of meaning. King - Man + Woman = Queen. The bias embedded in word vectors. Who decided what relationship was "analogous"?</div>
+        <span class="tag-sm t-crit">Critical</span>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Project: Embed Your Community</div>
+        <div class="c-body">Train word embeddings on text from your community (Reddit, Twitter, local news). Visualize the geometry. Document what biases the algorithm learned and from where.</div>
+        <span class="tag-sm t-proj">Project</span>
+      </div>
+    </div>
+
+    <!-- MIDTERM -->
+    <div class="unit-divider dark-div">// Midpoint — Portfolio Exhibition + Project Design Sprint</div>
+
+    <div class="cal-row" style="background:rgba(255,255,255,0.01);">
+      <div class="cal-wk"><span class="wk-n">09</span><span class="wk-s">Mid</span></div>
+      <div class="cal-cell">
+        <div class="c-title">Portfolio Exhibition</div>
+        <div class="c-body">Community showcase. Present your first major project: the technical work, the critical analysis, and what you'd do differently. Peer + guest feedback.</div>
+        <span class="tag-sm t-exhibit">Exhibition</span>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Critical ML Guest Panel</div>
+        <div class="c-body">Practitioner from healthcare, criminal justice, or hiring technology. Class debates: "What should ML never be allowed to decide?" Structured discussion, not lecture.</div>
+        <span class="tag-sm t-crit">Critical</span>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Final Project Pitch</div>
+        <div class="c-body">Students pitch final project topics. Peer + instructor structured feedback. Learning partnerships form around shared domains. Begin iteration cycle.</div>
+        <span class="tag-sm t-proj">Project</span>
+      </div>
+    </div>
+
+    <!-- UNIT 4: NEURAL NETWORKS -->
+    <div class="unit-divider rose-div">Unit 4 — Deep Learning: Neural Networks, Backpropagation, Architectures</div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-n">10</span><span class="wk-s">Unit 4</span></div>
+      <div class="cal-cell">
+        <div class="c-title">Neural Networks: The Full Picture</div>
+        <div class="c-body">From linear regression to a 3-layer MLP in one step. Activation functions (sigmoid, ReLU, tanh) and why they exist. The universal approximation theorem — and its limits.</div>
+        <span class="tag-sm t-found">Foundational</span>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Backpropagation: Every Step</div>
+        <div class="c-body">Computational graphs. Forward pass. Chain rule applied. Backward pass. Gradient accumulation. Builder: NumPy. Architect: implement autograd from scratch. Novice: trace visually.</div>
+        <span class="tag-sm t-math">Math Root</span>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Lab: MLP on Tabular Data</div>
+        <div class="c-body">Implement a 3-layer neural network in NumPy. Train on a social issue dataset. Compare to logistic regression. Understand what the extra complexity buys you.</div>
+        <span class="tag-sm t-proj">Project</span>
+      </div>
+    </div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-n">11</span><span class="wk-s">Unit 4</span></div>
+      <div class="cal-cell">
+        <div class="c-title">Convolutional Neural Networks</div>
+        <div class="c-body">Translation invariance. Filters, pooling, feature maps. How spatial structure is exploited. From edge detection to face recognition — including its dangers.</div>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Training Deep Networks</div>
+        <div class="c-body">Vanishing gradients, batch normalization, dropout. Why deep learning is hard to train — and why modern tricks work. The gap between theory and practice.</div>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Lab: Interpret What the Model Sees</div>
+        <div class="c-body">Use saliency maps and Grad-CAM to visualize what a CNN is paying attention to. Does it match your expectations? Document the gap. Buolamwini: "Gender Shades" paper.</div>
+        <span class="tag-sm t-crit">Critical</span>
+      </div>
+    </div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-n">12</span><span class="wk-s">Unit 4</span></div>
+      <div class="cal-cell">
+        <div class="c-title">Sequence Models + Transformers</div>
+        <div class="c-body">RNNs, the vanishing gradient problem, LSTMs. Then self-attention as a solution. The transformer architecture — demystified. How does attention work mathematically?</div>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Transfer Learning</div>
+        <div class="c-body">Pre-training + fine-tuning. What gets transferred and why. The implicit world model in a pre-trained model. Who built that model, on whose data, for whose benefit?</div>
+        <span class="tag-sm t-crit">Critical</span>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Lab: Fine-Tune for Your Use Case</div>
+        <div class="c-body">Fine-tune a small pre-trained model (BERT-tiny or similar) on a task meaningful to your community. Document what the pre-trained knowledge helps and hurts.</div>
+        <span class="tag-sm t-proj">Project</span>
+      </div>
+    </div>
+
+    <!-- UNIT 5: ADVANCED TOPICS -->
+    <div class="unit-divider cyan-div">Unit 5 — Advanced Topics: Fairness, Robustness, Bayesian Methods, RL</div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-n">13</span><span class="wk-s">Unit 5</span></div>
+      <div class="cal-cell">
+        <div class="c-title">Bayesian Machine Learning</div>
+        <div class="c-body">Priors as assumptions. Posteriors as updated beliefs. Bayesian linear regression. The full Bayesian approach vs. MAP vs. MLE. When does being Bayesian matter?</div>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Calibration + Uncertainty</div>
+        <div class="c-body">A model that says "70% confident" should be right 70% of the time. Calibration plots. Temperature scaling. Ko: "uncertainty is the lesson." Most production ML ignores this.</div>
+        <span class="tag-sm t-math">Math Root</span>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Lab: Is Your Model Calibrated?</div>
+        <div class="c-body">Compute calibration curves for a medical prediction model. Analyze: what happens when an overconfident model informs a doctor's decision?</div>
+        <span class="tag-sm t-crit">Critical</span>
+      </div>
+    </div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-n">14</span><span class="wk-s">Unit 5</span></div>
+      <div class="cal-cell">
+        <div class="c-title">Algorithmic Fairness</div>
+        <div class="c-body">Demographic parity, equalized odds, predictive parity — and the impossibility theorem proving they can't all hold simultaneously. This is not a failure of engineering. It's a political choice.</div>
+        <span class="tag-sm t-crit">Critical</span>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Adversarial ML</div>
+        <div class="c-body">FGSM attacks. The brittleness of deep learning. Certified robustness. Adversarial examples as a mirror: the model didn't learn what we thought it learned.</div>
+        <span class="tag-sm t-found">Foundational</span>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Lab: Attack Your Own Model</div>
+        <div class="c-body">Generate adversarial examples against a model you built earlier. Document what the attack reveals about what the model actually learned. Propose a defense and test it.</div>
+        <span class="tag-sm t-proj">Project</span>
+      </div>
+    </div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-n">15</span><span class="wk-s">Unit 5</span></div>
+      <div class="cal-cell">
+        <div class="c-title">Reinforcement Learning Intro</div>
+        <div class="c-body">MDPs, Q-learning, policy gradients. The reward function as a value system. Who defines the reward? Goodhart's Law. The alignment problem as an ML problem.</div>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Human-in-the-Loop ML</div>
+        <div class="c-body">Active learning, RLHF, annotation pipelines. Who are the annotators? What are they paid? Whose judgments define "correct" in supervised learning?</div>
+        <span class="tag-sm t-crit">Critical</span>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Lab: Design a Reward Function</div>
+        <div class="c-body">Implement Q-learning on a gridworld. Design the reward yourself. Observe what the agent optimizes for. Reflect: what did you accidentally teach it to value?</div>
+        <span class="tag-sm t-proj">Project</span>
+      </div>
+    </div>
+
+    <!-- FINAL WEEKS -->
+    <div class="unit-divider dark-div">// Final Weeks — Synthesis, Exhibition, Celebration</div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-n">16</span><span class="wk-s">Final</span></div>
+      <div class="cal-cell">
+        <div class="c-title">ML in the Wild</div>
+        <div class="c-body">The gap between research ML and production ML. Data pipelines, model monitoring, distribution shift. What happens when the world changes and the model doesn't know?</div>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">The Practitioner's Responsibility</div>
+        <div class="c-body">Jeff Anderson: navigate vs. transform harmful systems. As a future ML practitioner, you will be asked to build things that harm people. How will you respond? What is your line?</div>
+        <span class="tag-sm t-crit">Critical</span>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Final Project Studio</div>
+        <div class="c-body">Dedicated studio time. Learning conference check-ins. Peer feedback sessions. Document your process documentation, not just final results.</div>
+        <span class="tag-sm t-proj">Project</span>
+      </div>
+    </div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-n">17</span><span class="wk-s">Final</span></div>
+      <div class="cal-cell">
+        <div class="c-title">Final Exhibition — Day 1</div>
+        <div class="c-body">Community showcase. Present your complete project: the problem, the pipeline, the results, the failures, and the implications. Invited guests from the community.</div>
+        <span class="tag-sm t-exhibit">Exhibition</span>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Portfolio Learning Conferences</div>
+        <div class="c-body">Individual meetings: you present your full portfolio and assign your grade with evidence. This is the most important evaluation moment of the course.</div>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Portfolio Due</div>
+        <div class="c-body">All projects, concept notes, critical essays, reflections, and final self-evaluation. The evidence of your learning journey, not just its destination.</div>
+      </div>
+    </div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-n">18</span><span class="wk-s">Finale</span></div>
+      <div class="cal-cell">
+        <div class="c-title">Final Exhibition — Day 2 + Celebration</div>
+        <div class="c-body">Remaining presentations. Celebration of learning. Reflection on the semester. What does this course leave with you — and what do you leave in it?</div>
+        <span class="tag-sm t-exhibit">Exhibition</span>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Where Do You Go From Here?</div>
+        <div class="c-body">Transfer pathways, careers in ethical ML, open-source contribution, communities doing justice-focused data work. You are a practitioner. Act accordingly.</div>
+      </div>
+      <div class="cal-cell">
+        <div class="c-title">Course Co-Evaluation</div>
+        <div class="c-body">You evaluate the course. Your feedback co-creates the next version. Freire's dialogic education: the student teaches the teacher. This is that moment.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ASSESSMENT -->
+<hr class="section-line">
+<section id="assessment">
+  <div class="overline">Portfolio + Ungrading</div>
+  <h2>Evidence Over Performance.<br><em>Always.</em></h2>
+  <p class="lead">
+    Adapted from Jeff Anderson's ungrading practice. The goal is not to perform mastery for a grade. The goal is to build real, transferable understanding you can use in 10 years. Evidence of learning — not test scores — is the currency.
+  </p>
+
+  <div class="assess-grid">
+    <div class="assess-card">
+      <div class="assess-icon">📂</div>
+      <div class="assess-title">Your Portfolio</div>
+      <p class="assess-body">A living document of your learning journey. Process over product. First attempts, failures, revised understanding — all included. Ko: "we study programming with human-centered methods." Apply that to your own learning.</p>
+      <ul class="assess-items">
+        <li>All project code with documented thinking</li>
+        <li>Concept notes in your own language</li>
+        <li>Critical essays: who built this, for whom?</li>
+        <li>Bi-weekly learning reflections</li>
+        <li>Evidence of peer teaching + feedback given</li>
+        <li>"Conquering College" meta-learning log</li>
+      </ul>
+    </div>
+    <div class="assess-card">
+      <div class="assess-icon">🔁</div>
+      <div class="assess-title">Three Feedback Loops</div>
+      <p class="assess-body">You receive feedback from three sources. The instructor is the smallest source — mirroring professional practice where self-assessment and peer review are the primary quality signals.</p>
+      <ul class="assess-items">
+        <li>Self-directed: 2-min question rule, first-principles checks</li>
+        <li>Peer: weekly learning partnerships + group sessions</li>
+        <li>Instructor: bi-weekly coaching conferences (not grading)</li>
+        <li>All feedback is specific and forward-looking, not evaluative</li>
+      </ul>
+    </div>
+    <div class="assess-card">
+      <div class="assess-icon">✍️</div>
+      <div class="assess-title">You Assign Your Grade</div>
+      <p class="assess-body">At the end of the course, you write a final self-evaluation with evidence from your portfolio. You assign your grade. The instructor reviews and recommends. If the evidence is there, it's confirmed. This is not a trick — it's how trust-based education works.</p>
+      <ul class="assess-items">
+        <li>A: Deep engagement with all major concepts + strong projects</li>
+        <li>B: Solid understanding, some gaps, consistent effort</li>
+        <li>C: Surface coverage, significant gaps, limited project depth</li>
+        <li>No D/F for students who show up and engage honestly</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+
+<!-- HOW TO SUCCEED -->
+<section class="succeed-section" id="succeed" aria-label="How to succeed">
+  <div style="font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);margin-bottom:16px;">// Learning Strategy</div>
+  <h2 style="font-family:var(--display);font-size:clamp(28px,3.5vw,48px);font-style:italic;margin-bottom:16px;">How to Succeed <em style='color:var(--cyan)'>in ML</em></h2>
+  <p style="font-size:15px;line-height:1.85;color:var(--muted);max-width:680px;margin-bottom:0;">These aren't hacks — they're how people actually learn hard math and code. Especially if you're first-gen in a field that wasn't built for you.</p>
+  <div class="succeed-grid">
+    <div class="succeed-card">
+      <div class="succeed-num">01</div>
+      <div class="succeed-title">Derive Before You Cite</div>
+      <p class="succeed-body">Before writing θ := θ - α∇J, derive it. What is J? Why do we subtract? What does the gradient point toward? Derivation is the deepest form of understanding.</p>
+    </div>
+    <div class="succeed-card">
+      <div class="succeed-num">02</div>
+      <div class="succeed-title">Implement Before Import</div>
+      <p class="succeed-body">You cannot call sklearn.LinearRegression() until your NumPy version passes unit tests. This rule is the core of the course. Every abstraction is earned, not given.</p>
+    </div>
+    <div class="succeed-card">
+      <div class="succeed-num">03</div>
+      <div class="succeed-title">Plot Everything</div>
+      <p class="succeed-body">Loss curves. Decision boundaries. Confusion matrices. Calibration plots. In ML, seeing IS understanding. If you haven't plotted it, you haven't understood it yet.</p>
+    </div>
+    <div class="succeed-card">
+      <div class="succeed-num">04</div>
+      <div class="succeed-title">Sanity Check with n=5</div>
+      <p class="succeed-body">Before running on 10,000 rows, run on 5. Hand-verify every output. Does the loss go down? Are the shapes right? Bugs in ML fail silently — you have to check.</p>
+    </div>
+    <div class="succeed-card">
+      <div class="succeed-num">05</div>
+      <div class="succeed-title">Speak the Math Aloud</div>
+      <p class="succeed-body">Explain gradient descent out loud without writing a formula. If you can't, you don't understand it yet. Talk to a classmate. Talk to yourself. Verbalization catches gaps that code hides.</p>
+    </div>
+    <div class="succeed-card">
+      <div class="succeed-num">06</div>
+      <div class="succeed-title">Ask Who Bears the Cost</div>
+      <p class="succeed-body">Every time a model "works," ask: who was in the training set, and who wasn't? What does high accuracy hide? This question is not optional — it is part of the assignment.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONCEPT MAP -->
+<section class="concept-map-section" id="concept-map" aria-label="Concept connections">
+  <div style="font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);margin-bottom:16px;">// How It All Connects</div>
+  <h2 style="font-family:var(--display);font-size:clamp(28px,3.5vw,48px);font-style:italic;margin-bottom:16px;">The ML Concept <em style='color:var(--cyan)'>Map</em></h2>
+  <p style="font-size:15px;line-height:1.85;color:var(--muted);max-width:680px;margin-bottom:32px;">Every algorithm in this course connects back to the same root question: what does it mean for a machine to learn from data?</p>
+  <div class="concept-flows">
+    <div class="concept-flow">
+      <div class="concept-flow-label">The Root</div>
+      Loss Function J(θ)<br>
+      <span class="arrow">↓</span> MLE Derivation<br>
+      <span class="arrow">↓</span> Gradient Descent<br>
+      <span class="arrow">↓</span> Every Supervised Model
+    </div>
+    <div class="concept-flow">
+      <div class="concept-flow-label">Linear Methods</div>
+      Linear Regression<br>
+      <span class="arrow">↓</span> Logistic Regression<br>
+      <span class="arrow">↓</span> Regularization<br>
+      <span class="arrow">↓</span> SVMs / Decision Trees
+    </div>
+    <div class="concept-flow">
+      <div class="concept-flow-label">Deep Learning</div>
+      Perceptron → MLP<br>
+      <span class="arrow">↓</span> Backpropagation<br>
+      <span class="arrow">↓</span> CNNs / Transformers<br>
+      <span class="arrow">↓</span> Transfer Learning
+    </div>
+    <div class="concept-flow">
+      <div class="concept-flow-label">Unsupervised</div>
+      K-Means / GMM<br>
+      <span class="arrow">↓</span> EM Algorithm<br>
+      <span class="arrow">↓</span> PCA / Embeddings<br>
+      <span class="arrow">↓</span> Representation Bias
+    </div>
+    <div class="concept-flow">
+      <div class="concept-flow-label">Evaluation</div>
+      Bias-Variance Tradeoff<br>
+      <span class="arrow">↓</span> Cross-Validation<br>
+      <span class="arrow">↓</span> Calibration<br>
+      <span class="arrow">↓</span> Fairness Metrics
+    </div>
+    <div class="concept-flow">
+      <div class="concept-flow-label">Critical Thread</div>
+      What data was used?<br>
+      <span class="arrow">↓</span> Who is in the sample?<br>
+      <span class="arrow">↓</span> What does it encode?<br>
+      <span class="arrow">↓</span> Who bears the error?
+    </div>
+  </div>
+</section>
+
+<!-- DATASETS -->
+<section class="datasets-section" id="datasets" aria-label="Datasets">
+  <div style="font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);margin-bottom:16px;">// Real Data</div>
+  <h2 style="font-family:var(--display);font-size:clamp(28px,3.5vw,48px);font-style:italic;margin-bottom:16px;">Practice with <em style='color:var(--cyan)'>Real Datasets</em></h2>
+  <p style="font-size:15px;line-height:1.85;color:var(--muted);max-width:680px;margin-bottom:0;">Every algorithm should be practiced on data that has real consequence. These datasets are curated for both technical learning and critical analysis.</p>
+  <div class="dataset-grid">
+    <div class="dataset-item">
+      <div class="dataset-name">ProPublica COMPAS</div>
+      <p class="dataset-desc">Recidivism prediction scores. Foundational for bias auditing, precision/recall analysis, and fairness impossibility theorem work.</p>
+      <a class="dataset-link" href="https://github.com/propublica/compas-analysis" target="_blank" rel="noopener">→ Get Dataset</a>
+    </div>
+    <div class="dataset-item">
+      <div class="dataset-name">Census Income (Adult)</div>
+      <p class="dataset-desc">Binary classification benchmark. Predict income &gt;50K. Rich in demographic features for fairness analysis across class, gender, race.</p>
+      <a class="dataset-link" href="https://archive.ics.uci.edu/dataset/2/adult" target="_blank" rel="noopener">→ Get Dataset</a>
+    </div>
+    <div class="dataset-item">
+      <div class="dataset-name">ACS PUMS (Census Bureau)</div>
+      <p class="dataset-desc">American Community Survey. 50-state housing and income microdata. Much richer than Adult for intersectional analysis. Used in FolkTables benchmark.</p>
+      <a class="dataset-link" href="https://github.com/socialfoundations/folktables" target="_blank" rel="noopener">→ Get Dataset</a>
+    </div>
+    <div class="dataset-item">
+      <div class="dataset-name">Spotify Tracks Dataset</div>
+      <p class="dataset-desc">~600K tracks with audio features (tempo, energy, valence). Excellent for clustering, regression, and recommendation system work.</p>
+      <a class="dataset-link" href="https://huggingface.co/datasets/maharshipandya/spotify-tracks-dataset" target="_blank" rel="noopener">→ Get Dataset</a>
+    </div>
+    <div class="dataset-item">
+      <div class="dataset-name">Hate Speech + Offensive Language</div>
+      <p class="dataset-desc">25K tweets labeled across three categories. NLP classification + critical: study how annotator demographics affect labeling.</p>
+      <a class="dataset-link" href="https://github.com/t-davidson/hate-speech-and-offensive-language" target="_blank" rel="noopener">→ Get Dataset</a>
+    </div>
+    <div class="dataset-item">
+      <div class="dataset-name">MIMIC-III (Clinical)</div>
+      <p class="dataset-desc">De-identified ICU health records from 46K patients. Requires credentialing. Excellent for discussing clinical AI bias and Obermeyer et al. (2019).</p>
+      <a class="dataset-link" href="https://physionet.org/content/mimiciii/1.4/" target="_blank" rel="noopener">→ Get Dataset</a>
+    </div>
+  </div>
+</section>
+
+<!-- BADGES -->
+<section class="badges-section" id="badges" aria-label="Mastery badges">
+  <div style="font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);margin-bottom:16px;">// Mastery</div>
+  <h2>Earn Your<br><em>Algorithm Badge</em></h2>
+  <p class="lead" style="color:var(--muted);margin-bottom:32px;">Complete units to unlock badges. Tracked locally — a record of your learning, not a grade.</p>
+  <div class="badge-grid">
+    <div class="badge-item" id="badge-explorer">
+      <span class="badge-icon">🌱</span>
+      <div class="badge-name">Data Explorer</div>
+      <div class="badge-status">Complete 3+ units</div>
+    </div>
+    <div class="badge-item" id="badge-builder">
+      <span class="badge-icon">🔨</span>
+      <div class="badge-name">ML Implementer</div>
+      <div class="badge-status">Complete 6+ units</div>
+    </div>
+    <div class="badge-item" id="badge-architect">
+      <span class="badge-icon">🔬</span>
+      <div class="badge-name">ML Theorist</div>
+      <div class="badge-status">Complete all 9 units</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-brand">CS <span>185</span><br>Intro to ML</div>
+      <div class="footer-tagline">
+        Foothill College · West Valley College<br>
+        3 Units · 18 Weeks · First Principles + Project-Based<br>
+        Liberatory Education · Ungrading · Community-Centered
+      </div>
+    </div>
+    <div class="footer-cols">
+      <div class="footer-col">
+        <h4>Informed By</h4>
+        <ul>
+          <li>Dr. Amy J. Ko</li>
+          <li>Jeff Anderson</li>
+          <li>Paulo Freire</li>
+          <li>bell hooks</li>
+          <li>Joy Buolamwini</li>
+          <li>Safiya Noble</li>
+          <li>Ruha Benjamin</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Free Resources</h4>
+        <ul>
+          <li>Stanford CS229 Notes</li>
+          <li>fast.ai Course</li>
+          <li>3Blue1Brown</li>
+          <li>Karpathy's micrograd</li>
+          <li>Google Colab</li>
+          <li>Hugging Face</li>
+          <li>ProPublica COMPAS</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>CS 185 — Introduction to Machine Learning</span>
+    <span>All resources free · No required textbook</span>
+  </div>
+</footer>
+
+<script src="js/progress.js"></script>
+</body>
+</html>

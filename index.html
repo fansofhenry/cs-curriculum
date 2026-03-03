@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CS Curriculum — Foothill / West Valley College</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@300;400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0d0d0d;
+  --paper: #f5f0e8;
+  --cream: #ede8d8;
+  --red: #c1121f;
+  --orange: #e36414;
+  --teal: #0a7c6e;
+  --gold: #d4a017;
+  --dim: #5a5a5a;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* grain */
+body::after {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: .03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── MASTHEAD ── */
+.masthead {
+  background: var(--ink);
+  color: var(--paper);
+  border-bottom: 5px solid var(--red);
+  padding: 0;
+}
+.mast-top {
+  padding: 12px 60px;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  opacity: .5;
+  display: flex;
+  justify-content: space-between;
+}
+.mast-main {
+  padding: 48px 60px 40px;
+}
+.mast-kicker {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 20px;
+}
+.mast-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(60px, 9vw, 120px);
+  letter-spacing: .02em;
+  line-height: .88;
+  margin-bottom: 28px;
+}
+.mast-title span { color: var(--red); }
+.mast-desc {
+  font-size: 15px;
+  line-height: 1.9;
+  color: rgba(245,240,232,.6);
+  max-width: 620px;
+  font-weight: 300;
+}
+.mast-pills {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 28px;
+}
+.pill {
+  padding: 5px 14px;
+  border: 1px solid rgba(255,255,255,.15);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: rgba(245,240,232,.5);
+}
+
+/* ── COURSES ── */
+.courses {
+  padding: 80px 60px;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+.courses-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.courses-label::before { content: '//'; color: var(--cream); }
+
+.course-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 2px solid var(--ink);
+}
+
+.course-card {
+  border-right: 2px solid var(--ink);
+  display: flex;
+  flex-direction: column;
+  transition: background .2s;
+  text-decoration: none;
+  color: inherit;
+}
+.course-card:last-child { border-right: none; }
+.course-card:hover { background: var(--cream); }
+.course-card:focus-visible { outline: 3px solid var(--red); outline-offset: -3px; }
+
+.card-top {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 32px 36px 28px;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+.course-card:hover .card-top { background: #1a1a1a; }
+
+.card-ghost {
+  position: absolute;
+  right: -10px;
+  bottom: -20px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 100px;
+  line-height: 1;
+  opacity: .06;
+  pointer-events: none;
+}
+
+.card-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  opacity: .4;
+  margin-bottom: 14px;
+}
+.card-course-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 52px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.card-course-num span { color: var(--red); }
+.card-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 18px;
+  font-style: italic;
+  color: rgba(245,240,232,.75);
+  line-height: 1.3;
+}
+
+.card-body {
+  padding: 28px 36px 36px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-desc {
+  font-size: 13.5px;
+  line-height: 1.8;
+  color: var(--dim);
+  flex: 1;
+  margin-bottom: 24px;
+}
+
+.card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px solid var(--cream);
+  padding-top: 20px;
+  margin-bottom: 24px;
+}
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: .06em;
+}
+.meta-label { color: var(--dim); opacity: .7; }
+.meta-value { color: var(--ink); font-weight: 400; }
+
+.card-cta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--red);
+  font-weight: 400;
+  transition: gap .2s;
+}
+.course-card:hover .card-cta { gap: 16px; }
+.cta-arrow { font-size: 18px; }
+
+/* color accents per course */
+.course-card.c180 .card-course-num span { color: var(--red); }
+.course-card.c185 .card-course-num span { color: #4dd9f0; }
+.course-card.c185 .card-top { background: #060b14; }
+.course-card.c185 .card-title { color: rgba(200,235,255,.7); }
+.course-card.c185 .card-cta { color: #4dd9f0; }
+.course-card.c210 .card-course-num span { color: var(--orange); }
+.course-card.c210 .card-top { background: #1a1205; }
+.course-card.c210 .card-title { color: rgba(250,246,240,.7); }
+.course-card.c210 .card-cta { color: var(--orange); }
+
+/* ── PHILOSOPHY STRIP ── */
+.phil-strip {
+  background: var(--red);
+  color: white;
+  padding: 48px 60px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 48px;
+  align-items: center;
+}
+.phil-quote {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(22px, 2.8vw, 34px);
+  font-style: italic;
+  line-height: 1.35;
+  max-width: 760px;
+}
+.phil-source {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  opacity: .6;
+  margin-top: 14px;
+}
+.phil-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex-shrink: 0;
+}
+.phil-stat {
+  text-align: right;
+}
+.phil-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 48px;
+  line-height: 1;
+  color: rgba(255,255,255,.9);
+}
+.phil-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.5);
+}
+
+/* ── THINKERS ── */
+.thinkers {
+  padding: 80px 60px;
+  border-top: 2px solid var(--ink);
+  max-width: 1300px;
+  margin: 0 auto;
+}
+.thinkers-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 36px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.thinkers-label::before { content: '//'; color: var(--cream); }
+.thinker-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--cream);
+}
+.thinker {
+  padding: 22px 0 22px 28px;
+  border-right: 1px solid var(--cream);
+  border-bottom: 1px solid var(--cream);
+}
+.thinker:nth-child(4n) { border-right: none; }
+.thinker-name {
+  font-family: 'DM Serif Display', serif;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+.thinker-desc {
+  font-size: 11.5px;
+  line-height: 1.65;
+  color: var(--dim);
+}
+
+/* ── FOOTER ── */
+footer {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 40px 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 3px solid var(--red);
+}
+.footer-left {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .08em;
+  color: rgba(245,240,232,.35);
+  line-height: 2;
+}
+.footer-right {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: .05em;
+  color: rgba(245,240,232,.15);
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.mast-kicker { animation: fadeUp .5s ease .1s both; }
+.mast-title  { animation: fadeUp .6s ease .25s both; }
+.mast-desc   { animation: fadeUp .6s ease .4s both; }
+.mast-pills  { animation: fadeUp .6s ease .55s both; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1000px) {
+  .course-grid { grid-template-columns: 1fr; }
+  .course-card { border-right: none; border-bottom: 2px solid var(--ink); }
+  .course-card:last-child { border-bottom: none; }
+  .mast-top, .mast-main, .courses, .thinkers { padding-left: 28px; padding-right: 28px; }
+  .phil-strip { grid-template-columns: 1fr; gap: 24px; padding: 40px 28px; }
+  .phil-stats { flex-direction: row; gap: 28px; }
+  .thinker-row { grid-template-columns: repeat(2, 1fr); }
+  .thinker:nth-child(2n) { border-right: none; }
+  footer { flex-direction: column; gap: 16px; text-align: center; padding: 28px; }
+}
+</style>
+</head>
+<body>
+
+<!-- MASTHEAD -->
+<header class="masthead">
+  <div class="mast-top">
+    <span>Foothill · West Valley College</span>
+    <span>Computer Science Department</span>
+    <span>Liberatory Education · Ungrading · Project-Based</span>
+  </div>
+  <div class="mast-main">
+    <div class="mast-kicker">CS Curriculum · Three Courses</div>
+    <div class="mast-title">
+      Teaching<br>
+      <span>Computing</span><br>
+      Differently.
+    </div>
+    <p class="mast-desc">
+      AI, Machine Learning, and Data Structures taught from first principles — with equity, critical consciousness, and community at the center. No required textbooks. No exams. All projects.
+    </p>
+    <div class="mast-pills">
+      <span class="pill">3 Learning Tracks per Course</span>
+      <span class="pill">18 Weeks · Project-Based</span>
+      <span class="pill">Ungrading · Portfolio</span>
+      <span class="pill">Amy Ko · Jeff Anderson</span>
+      <span class="pill">Freire · bell hooks</span>
+      <span class="pill">All Resources Free</span>
+    </div>
+  </div>
+</header>
+
+<!-- COURSES -->
+<div class="courses">
+  <div class="courses-label">Three Courses</div>
+
+  <div class="course-grid">
+
+    <!-- CS 180 -->
+    <a class="course-card c180" href="cs180-intro-ai.html" aria-label="CS 180 — Introduction to Artificial Intelligence">
+      <div class="card-top">
+        <div class="card-ghost">AI</div>
+        <div class="card-num">Course 01 of 03</div>
+        <div class="card-course-num">CS <span>180</span></div>
+        <div class="card-title">Introduction to<br>Artificial Intelligence</div>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">
+          AI is not magic — it is math, history, and human choice. We build from first principles: probability, search, neural networks, language models. Then we ask who built these systems, for whom, and what they're encoding about the world.
+        </p>
+        <div class="card-meta">
+          <div class="meta-row"><span class="meta-label">Units</span><span class="meta-value">3 · 18 Weeks</span></div>
+          <div class="meta-row"><span class="meta-label">Prereq</span><span class="meta-value">None (Track I) · Python (Track II+)</span></div>
+          <div class="meta-row"><span class="meta-label">Projects</span><span class="meta-value">9 Major · 2 Exhibitions</span></div>
+          <div class="meta-row"><span class="meta-label">Thinkers</span><span class="meta-value">Turing · Buolamwini · Noble</span></div>
+        </div>
+        <div class="card-cta"><span>Open Course Site</span><span class="cta-arrow">→</span></div>
+      </div>
+    </a>
+
+    <!-- CS 185 -->
+    <a class="course-card c185" href="cs185-intro-ml.html" aria-label="CS 185 — Introduction to Machine Learning">
+      <div class="card-top">
+        <div class="card-ghost">ML</div>
+        <div class="card-num">Course 02 of 03</div>
+        <div class="card-course-num">CS <span>185</span></div>
+        <div class="card-title">Introduction to<br>Machine Learning</div>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">
+          ML algorithms are not neutral mathematical facts — they are choices about what to optimize, whose data counts, who bears the error. We derive every algorithm before using it, implement from scratch before touching any library.
+        </p>
+        <div class="card-meta">
+          <div class="meta-row"><span class="meta-label">Units</span><span class="meta-value">3 · 18 Weeks</span></div>
+          <div class="meta-row"><span class="meta-label">Prereq</span><span class="meta-value">Basic Python · Some Math</span></div>
+          <div class="meta-row"><span class="meta-label">Projects</span><span class="meta-value">8 Major · Bias Audits</span></div>
+          <div class="meta-row"><span class="meta-label">Thinkers</span><span class="meta-value">Ko · Benjamin · Obermeyer</span></div>
+        </div>
+        <div class="card-cta"><span>Open Course Site</span><span class="cta-arrow">→</span></div>
+      </div>
+    </a>
+
+    <!-- CS 210 -->
+    <a class="course-card c210" href="cs210-dsa.html" aria-label="CS 210 — Data Structures and Algorithms">
+      <div class="card-top">
+        <div class="card-ghost">DS</div>
+        <div class="card-num">Course 03 of 03</div>
+        <div class="card-course-num">CS <span>210</span></div>
+        <div class="card-title">Data Structures<br>&amp; Algorithms</div>
+      </div>
+      <div class="card-body">
+        <p class="card-desc">
+          Every data structure is an argument about the world. Every algorithm is a strategy, a tradeoff, a value judgment. We implement every structure before using the library version. No LeetCode grind culture — deep projects that transfer.
+        </p>
+        <div class="card-meta">
+          <div class="meta-row"><span class="meta-label">Units</span><span class="meta-value">4 · 18 Weeks</span></div>
+          <div class="meta-row"><span class="meta-label">Prereq</span><span class="meta-value">Python or Java · OOP</span></div>
+          <div class="meta-row"><span class="meta-label">Projects</span><span class="meta-value">12 Mini Projects · Capstone</span></div>
+          <div class="meta-row"><span class="meta-label">Thinkers</span><span class="meta-value">Knuth · Dijkstra · Noble · Tarjan</span></div>
+        </div>
+        <div class="card-cta"><span>Open Course Site</span><span class="cta-arrow">→</span></div>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+<!-- PHILOSOPHY STRIP -->
+<div class="phil-strip">
+  <div>
+    <div class="phil-quote">
+      "The most advanced technical skill in these courses is understanding who built a system, for whom, and what it encodes about the world."
+    </div>
+    <div class="phil-source">Course Philosophy · Rooted in Freire, hooks, Ko, Anderson</div>
+  </div>
+  <div class="phil-stats">
+    <div class="phil-stat">
+      <div class="phil-num">0</div>
+      <div class="phil-label">Required Textbooks</div>
+    </div>
+    <div class="phil-stat">
+      <div class="phil-num">0</div>
+      <div class="phil-label">Exams</div>
+    </div>
+    <div class="phil-stat">
+      <div class="phil-num">3</div>
+      <div class="phil-label">Tracks per Course</div>
+    </div>
+  </div>
+</div>
+
+<!-- THINKERS -->
+<div class="thinkers">
+  <div class="thinkers-label">Intellectual Lineage</div>
+  <div class="thinker-row">
+    <div class="thinker">
+      <div class="thinker-name">Amy J. Ko</div>
+      <div class="thinker-desc">Equitable, joyous, liberatory computing education. Read before write. Student agency and trust.</div>
+    </div>
+    <div class="thinker">
+      <div class="thinker-name">Jeff Anderson</div>
+      <div class="thinker-desc">Ungrading, deep learning over shallow, Conquering College meta-skills. The 2-minute question rule.</div>
+    </div>
+    <div class="thinker">
+      <div class="thinker-name">Paulo Freire</div>
+      <div class="thinker-desc">Pedagogy of the Oppressed. Students are not empty vessels. Knowledge is a liberatory act.</div>
+    </div>
+    <div class="thinker">
+      <div class="thinker-name">bell hooks</div>
+      <div class="thinker-desc">Teaching to Transgress. The classroom as a site of freedom. Bringing the full self to learning.</div>
+    </div>
+    <div class="thinker">
+      <div class="thinker-name">Joy Buolamwini</div>
+      <div class="thinker-desc">Gender Shades. The coded gaze. Bias in facial recognition and its real-world consequences.</div>
+    </div>
+    <div class="thinker">
+      <div class="thinker-name">Safiya Umoja Noble</div>
+      <div class="thinker-desc">Algorithms of Oppression. Search engines encode power. Information retrieval is never neutral.</div>
+    </div>
+    <div class="thinker">
+      <div class="thinker-name">Ruha Benjamin</div>
+      <div class="thinker-desc">Race After Technology. "Neutral" automation encodes and amplifies racial hierarchy.</div>
+    </div>
+    <div class="thinker">
+      <div class="thinker-name">Donald Knuth</div>
+      <div class="thinker-desc">The Art of Computer Programming. Algorithms are art. Rigor and beauty are not opposites.</div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-left">
+    Foothill College · West Valley College · Computer Science Department<br>
+    All resources free and open-access · No required textbook purchases<br>
+    Liberatory Education · Project-Based Learning · Ungrading
+  </div>
+  <div class="footer-right">CS 180 · 185 · 210</div>
+</footer>
+
+</body>
+</html>

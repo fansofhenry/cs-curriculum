@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en" data-course="cs210">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CS 210 — Data Structures and Algorithms</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Epilogue:wght@300;400;700;900&family=Fira+Code:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root{--warm:#faf6f0;--parch:#f4ece0;--tan:#e8dcc8;--deep:#1a1205;--brown:#5c3d1e;--green:#1a5c2e;--rust:#b5451b;--gold:#c9860a;--plum:#5c1a4a;--blue:#1a3a5c;--serif:'Instrument Serif',Georgia,serif;--sans:'Epilogue',sans-serif;--code:'Fira Code',monospace;--rule:1.5px solid var(--deep)}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--warm);color:var(--deep);font-family:var(--sans);overflow-x:hidden}
+.stripe{height:10px;background:repeating-linear-gradient(90deg,var(--rust) 0,var(--rust) 20px,var(--gold) 20px,var(--gold) 40px,var(--green) 40px,var(--green) 60px,var(--deep) 60px,var(--deep) 80px)}
+header{padding:60px 64px 48px;border-bottom:2px solid var(--deep);background:var(--parch);position:relative;overflow:hidden}
+header::before{content:'DS&A';position:absolute;right:-20px;top:-30px;font-family:var(--serif);font-size:240px;color:rgba(26,18,5,.03);pointer-events:none;line-height:1}
+.eyebrow{font-family:var(--code);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--rust);margin-bottom:24px}
+h1{font-family:var(--serif);font-size:clamp(48px,7vw,100px);line-height:.92;font-weight:400;max-width:900px;position:relative;z-index:1}
+h1 em{font-style:italic;color:var(--rust)}
+.hrow{display:flex;justify-content:space-between;align-items:flex-end;margin-top:36px;gap:24px}
+.hdesc{font-size:16px;line-height:1.85;color:var(--brown);max-width:560px}
+.hstats{display:flex;border:var(--rule)}
+.hstat{padding:14px 22px;border-right:var(--rule);text-align:center}
+.hstat:last-child{border-right:none}
+.hn{font-family:var(--serif);font-size:34px;line-height:1;color:var(--rust);display:block}
+.hl{font-family:var(--code);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--brown);display:block;margin-top:2px}
+.philbar{background:var(--deep);color:var(--warm);padding:48px 64px;display:grid;grid-template-columns:repeat(3,1fr)}
+.pb{padding:0 36px;border-right:1px solid rgba(255,255,255,.1)}
+.pb:first-child{padding-left:0}.pb:last-child{border-right:none}
+.pbletter{font-family:var(--serif);font-size:56px;line-height:1;color:rgba(255,255,255,.06);margin-bottom:-8px}
+.pbtitle{font-family:var(--serif);font-size:20px;font-style:italic;margin-bottom:8px}
+.pbbody{font-size:13px;color:rgba(250,246,240,.55);line-height:1.8;font-weight:300}
+.sw{padding:72px 64px;max-width:1300px;margin:0 auto}
+.ol{font-family:var(--code);font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--rust);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.ol::before{content:'//';color:var(--tan)}
+h2{font-family:var(--serif);font-size:clamp(32px,4.5vw,56px);line-height:1;font-weight:400;margin-bottom:18px}
+h2 em{font-style:italic;color:var(--rust)}
+.lead{font-size:16px;line-height:1.9;color:var(--brown);max-width:720px;font-weight:300;margin-bottom:48px}
+hr.rul{border:none;border-top:var(--rule)}
+.pring{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:var(--rule);margin-top:40px}
+.prin{padding:32px;border-right:var(--rule);transition:background .2s}
+.prin:last-child{border-right:none}.prin:hover{background:var(--parch)}
+.piicon{font-size:26px;margin-bottom:10px}
+.pititle{font-family:var(--serif);font-size:19px;margin-bottom:7px;font-style:italic}
+.pibody{font-size:13px;color:var(--brown);line-height:1.75}
+.dsbanner{background:var(--deep);color:var(--warm);padding:56px 64px;display:flex;justify-content:space-between;align-items:center;gap:40px;border-top:2px solid var(--deep);border-bottom:2px solid var(--deep)}
+.dsbanner h2{color:var(--warm);font-size:clamp(28px,3.5vw,48px)}
+.dsbanner h2 em{color:var(--gold)}
+.dsbanner p{font-size:13px;color:rgba(250,246,240,.5);line-height:1.9;max-width:360px;border-left:2px solid rgba(255,255,255,.1);padding-left:24px;flex-shrink:0}
+.dsg{display:grid;grid-template-columns:1fr 1fr;border-left:var(--rule);border-right:var(--rule);border-bottom:var(--rule)}
+.dsc{border-right:var(--rule);border-bottom:var(--rule);transition:background .2s}
+.dsc:nth-child(2n){border-right:none}
+.dsc.fw{grid-column:1/-1;border-right:none}
+.dsc:hover{background:var(--parch)}
+.dsh{padding:24px 32px 18px;border-bottom:1px solid var(--tan);display:flex;justify-content:space-between}
+.dsn{font-family:var(--code);font-size:10px;color:var(--rust);letter-spacing:.12em}
+.dscx{font-family:var(--code);font-size:10px;color:var(--brown);text-align:right;line-height:1.8}
+.dsb{padding:20px 32px 28px}
+.dsname{font-family:var(--serif);font-size:26px;font-style:italic;margin-bottom:3px}
+.dssub{font-family:var(--code);font-size:11px;color:var(--rust);letter-spacing:.08em;margin-bottom:10px}
+.dsdesc{font-size:13px;color:var(--brown);line-height:1.75;margin-bottom:16px}
+.dsviz{background:var(--parch);border:1px solid var(--tan);padding:14px 16px;font-family:var(--code);font-size:11px;color:var(--brown);line-height:1.65;margin-bottom:16px;white-space:pre;overflow-x:auto}
+.dsc:hover .dsviz{background:var(--warm)}
+.dsproj{border:1.5px solid var(--deep);padding:12px 16px;margin-bottom:10px;position:relative}
+.dsproj::before{content:'PROJECT';position:absolute;top:-8px;left:10px;background:var(--warm);padding:0 6px;font-family:var(--code);font-size:8px;letter-spacing:.2em;color:var(--rust)}
+.dsc:hover .dsproj::before{background:var(--parch)}
+.dsprojt{font-weight:700;font-size:13px;margin-bottom:4px}
+.dsprojb{font-size:12px;color:var(--brown);line-height:1.6}
+.dstrk{display:flex;border:1px solid var(--tan);margin-top:8px}
+.dstr{flex:1;padding:9px 11px;border-right:1px solid var(--tan);font-size:11px;color:var(--brown);line-height:1.5}
+.dstr:last-child{border-right:none}
+.dtl{font-family:var(--code);font-size:8px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:3px}
+.nov{color:var(--green)}.bld{color:var(--gold)}.arc{color:var(--rust)}
+.dconn{font-family:var(--code);font-size:10px;color:var(--gold);margin-top:10px;padding:7px 10px;background:rgba(201,134,10,.06);border-left:2px solid var(--gold);line-height:1.5}
+.fw2{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.caltbl{border:var(--rule);margin-top:40px}
+.calth{display:grid;grid-template-columns:56px 1.4fr 1.4fr 1.4fr 1fr;background:var(--deep);color:var(--warm)}
+.calthc{padding:13px 16px;font-family:var(--code);font-size:9px;letter-spacing:.18em;text-transform:uppercase;border-right:1px solid rgba(255,255,255,.08)}
+.calthc:last-child{border-right:none}
+.calunit{padding:8px 16px;font-family:var(--code);font-size:9px;letter-spacing:.18em;text-transform:uppercase;border-top:var(--rule);display:flex;align-items:center;gap:8px}
+.u1{background:rgba(26,92,46,.06);color:var(--green);border-left:3px solid var(--green)}
+.u2{background:rgba(26,58,92,.06);color:var(--blue);border-left:3px solid var(--blue)}
+.u3{background:rgba(181,69,27,.08);color:var(--rust);border-left:3px solid var(--rust)}
+.u4{background:rgba(92,61,30,.06);color:var(--brown);border-left:3px solid var(--brown)}
+.u5{background:rgba(92,26,74,.06);color:var(--plum);border-left:3px solid var(--plum)}
+.calrow{display:grid;grid-template-columns:56px 1.4fr 1.4fr 1.4fr 1fr;border-top:1px solid var(--tan);transition:background .15s}
+.calrow:hover{background:var(--parch)}
+.cwk{padding:14px 8px 14px 16px;border-right:var(--rule);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.cwkn{font-family:var(--serif);font-size:22px;line-height:1}
+.cwku{font-family:var(--code);font-size:7px;color:var(--brown);opacity:.6;margin-top:2px;text-transform:uppercase}
+.cc{padding:14px 16px;border-right:1px solid var(--tan)}
+.cc:last-child{border-right:none}
+.ct{font-family:var(--serif);font-style:italic;font-size:14px;margin-bottom:3px}
+.cb{font-size:12px;color:var(--brown);line-height:1.6}
+.tag{display:inline-block;margin-top:5px;padding:2px 7px;font-family:var(--code);font-size:8px;letter-spacing:.08em}
+.tf{background:rgba(201,134,10,.1);color:var(--gold)}
+.tp{background:rgba(26,92,46,.1);color:var(--green)}
+.tc{background:rgba(181,69,27,.1);color:var(--rust)}
+.te{background:var(--deep);color:var(--warm)}
+.linwrap{background:var(--parch);padding:56px 64px;border-top:var(--rule);border-bottom:var(--rule)}
+.ling{display:grid;grid-template-columns:repeat(4,1fr);border:var(--rule);margin-top:32px}
+.lc{padding:24px 20px;border-right:var(--rule);transition:background .2s}
+.lc:last-child{border-right:none}.lc:hover{background:var(--warm)}
+.lname{font-family:var(--serif);font-size:16px;font-style:italic;margin-bottom:5px}
+.lrole{font-family:var(--code);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--rust);margin-bottom:6px}
+.lbody{font-size:12px;color:var(--brown);line-height:1.7}
+.aswrap{display:grid;grid-template-columns:1fr 1fr;border:var(--rule);margin-top:40px}
+.asl{background:var(--deep);color:var(--warm);padding:44px;border-right:var(--rule)}
+.asr{padding:44px}
+.asl h3{font-family:var(--serif);font-size:26px;font-style:italic;color:var(--gold);margin-bottom:16px}
+.asr h3{font-family:var(--serif);font-size:26px;font-style:italic;color:var(--rust);margin-bottom:16px}
+.aslist{list-style:none;display:flex;flex-direction:column;gap:9px}
+.aslist li{font-size:13px;padding-left:16px;position:relative;line-height:1.6}
+.asl .aslist li{color:rgba(250,246,240,.7)}
+.asl .aslist li::before{content:'→';position:absolute;left:0;color:var(--gold);font-family:var(--code);font-size:10px}
+.asr .aslist li{color:var(--brown)}
+.asr .aslist li::before{content:'→';position:absolute;left:0;color:var(--rust);font-family:var(--code);font-size:10px}
+footer{background:var(--deep);color:var(--warm);padding:60px 64px}
+.flay{display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px;margin-bottom:36px}
+.fbig{font-family:var(--serif);font-size:clamp(38px,4.5vw,64px);line-height:1}
+.fbig em{font-style:italic;color:var(--gold)}
+.fmeta{font-family:var(--code);font-size:10px;color:rgba(250,246,240,.3);line-height:2;margin-top:12px}
+.fcol h4{font-family:var(--code);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.fcol ul{list-style:none}
+.fcol li{font-size:12px;color:rgba(250,246,240,.4);padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.fbot{border-top:1px solid rgba(255,255,255,.1);padding-top:20px;display:flex;justify-content:space-between;font-family:var(--code);font-size:10px;color:rgba(250,246,240,.18);letter-spacing:.08em}
+@keyframes fu{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+h1{animation:fu .7s ease .1s both}.hrow{animation:fu .7s ease .3s both}
+@media(max-width:900px){header,.sw,.dsbanner,.linwrap,footer{padding-left:24px;padding-right:24px}.philbar{grid-template-columns:1fr;padding:32px 24px}.pb{padding:0;border-right:none;padding-bottom:18px}.h1{font-size:clamp(38px,10vw,72px)}.hrow,.dsg,.pring,.fw2{grid-template-columns:1fr}.dsc:nth-child(2n){border-right:none}.dstrk{flex-direction:column}.dtr{border-right:none}.calth,.calrow{grid-template-columns:50px 1fr}.cc:nth-child(n+3),.calthc:nth-child(n+3){display:none}.ling{grid-template-columns:1fr 1fr}.lc:nth-child(2n){border-right:none}.lc:nth-child(n+3){border-top:var(--rule)}.aswrap{grid-template-columns:1fr}.asl{border-right:none;border-bottom:var(--rule)}.flay{grid-template-columns:1fr;gap:20px}}
+
+.progress-strip{position:sticky;top:0;z-index:1000;background:var(--deep);padding:10px 64px;display:flex;align-items:center;gap:16px;border-bottom:2px solid var(--rust)}
+.progress-label{font-family:var(--code);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(250,246,240,.4);white-space:nowrap}
+#progress-text{font-family:var(--code);font-size:10px;color:rgba(250,246,240,.3);white-space:nowrap}
+.progress-track{flex:1;height:3px;background:rgba(255,255,255,.08)}
+#progress-fill{height:100%;background:var(--green);width:0%;transition:width .4s ease}
+#active-track-label{font-family:var(--code);font-size:10px;color:var(--gold);letter-spacing:.1em}
+.track-selector{display:flex;gap:0;border:var(--rule);margin-bottom:40px;flex-wrap:wrap}
+.track-btn{flex:1;padding:13px 18px;background:transparent;border:none;border-right:var(--rule);cursor:pointer;font-family:var(--code);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--brown);transition:all .2s;min-width:120px}
+.track-btn:last-child{border-right:none}
+.track-btn:hover{background:var(--parch);color:var(--deep)}
+.track-btn.active{background:var(--deep);color:var(--warm)}
+.track-btn:focus-visible{outline:2px solid var(--rust);outline-offset:-2px}
+.complete-btn{margin-top:12px;padding:7px 14px;background:transparent;border:1px solid var(--tan);cursor:pointer;font-family:var(--code);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--brown);transition:all .2s;display:block;width:100%}
+.complete-btn:hover{border-color:var(--green);color:var(--green)}
+.complete-btn.completed{background:var(--green);color:var(--warm);border-color:var(--green)}
+.recall-btn{margin-top:8px;padding:5px 10px;background:transparent;border:1px dashed var(--gold);cursor:pointer;font-family:var(--code);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);transition:all .2s}
+.recall-btn:hover{background:rgba(201,134,10,.06)}
+.recall-box{margin-top:10px;padding:14px 16px;background:rgba(201,134,10,.05);border-left:2px solid var(--gold);font-size:12.5px}
+.recall-box strong{font-family:var(--code);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:8px}
+.recall-box ul{list-style:none;display:flex;flex-direction:column;gap:5px}
+.recall-box li{padding-left:12px;position:relative;line-height:1.55;color:var(--brown);font-size:12px}
+.recall-box li::before{content:'→';position:absolute;left:0;color:var(--gold);font-family:var(--code)}
+.career-box{margin-top:12px;padding:10px 12px;background:rgba(26,92,46,.05);border-left:2px solid var(--green);font-size:11.5px}
+.career-box strong{font-family:var(--code);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--green);display:block;margin-bottom:5px}
+.career-box ul{list-style:none;display:flex;flex-wrap:wrap;gap:5px}
+.career-box li{padding:2px 7px;background:rgba(26,92,46,.1);color:var(--green);font-size:10.5px}
+.succeed-section{background:var(--parch);border-top:var(--rule);border-bottom:var(--rule);padding:64px 64px}
+.succeed-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0;border:var(--rule);margin-top:32px}
+.succeed-card{padding:28px;border-right:var(--rule);transition:background .2s}
+.succeed-card:last-child{border-right:none}
+.succeed-card:hover{background:var(--warm)}
+.succeed-num{font-family:var(--serif);font-size:40px;line-height:1;color:var(--rust);margin-bottom:8px}
+.succeed-title{font-family:var(--serif);font-size:16px;margin-bottom:7px;font-style:italic}
+.succeed-body{font-size:12.5px;line-height:1.75;color:var(--brown)}
+.concept-map-section{padding:64px 64px;border-top:var(--rule)}
+.concept-flows{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0;border:var(--rule);margin-top:32px}
+.concept-flow{padding:24px;border-right:var(--rule);font-family:var(--code);font-size:11.5px;line-height:1.9;color:var(--brown);transition:background .2s}
+.concept-flow:last-child{border-right:none}
+.concept-flow:hover{background:var(--parch)}
+.concept-flow-label{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--rust);margin-bottom:8px}
+.concept-flow .arrow{color:var(--gold)}
+.badges-section{padding:64px 64px;background:var(--deep);color:var(--warm);border-top:var(--rule)}
+.badge-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid rgba(255,255,255,.1)}
+.badge-item{padding:30px;border-right:1px solid rgba(255,255,255,.1);transition:background .2s;position:relative}
+.badge-item:last-child{border-right:none}
+.badge-item:hover{background:rgba(255,255,255,.04)}
+.badge-icon{font-size:32px;margin-bottom:10px;display:block}
+.badge-name{font-family:var(--serif);font-size:18px;font-style:italic;margin-bottom:5px}
+.badge-status{font-family:var(--code);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(250,246,240,.3)}
+.badge-item.badge-earned .badge-status{color:var(--gold)}
+.badge-item.badge-earned::after{content:'✓';position:absolute;right:18px;top:18px;font-size:22px;color:var(--gold)}
+.datasets-section{padding:64px 64px;border-top:var(--rule);background:var(--parch)}
+.dataset-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0;border:var(--rule);margin-top:32px}
+.dataset-item{padding:22px;border-right:var(--rule);transition:background .2s}
+.dataset-item:last-child{border-right:none}
+.dataset-item:hover{background:var(--warm)}
+.dataset-name{font-family:var(--serif);font-size:15px;font-style:italic;margin-bottom:4px}
+.dataset-desc{font-size:12px;color:var(--brown);line-height:1.6;margin-bottom:10px}
+.dataset-link{font-family:var(--code);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--rust);text-decoration:none;border-bottom:1px solid var(--rust)}
+.dataset-link:hover{color:var(--gold);border-color:var(--gold)}
+
+</style>
+</head>
+<body>
+<div class="progress-strip" role="status" aria-label="Course progress">
+  <span class="progress-label">Progress</span>
+  <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="progress-fill"></div></div>
+  <span id="progress-text">0 of 12 units completed</span>
+  <span style="color:rgba(255,255,255,.1);margin:0 8px">|</span>
+  <span class="progress-label">Track:</span>
+  <span id="active-track-label">All Tracks</span>
+</div>
+
+<div class="stripe"></div>
+<header>
+  <div class="eyebrow">CS 210 · 4 Units · Foothill / West Valley College · 18 Weeks</div>
+  <h1>Data Structures<br>&amp; <em>Algorithms</em></h1>
+  <div class="hrow">
+    <p class="hdesc">Every data structure is an argument about the world — a claim that some operations matter more than others. Every algorithm is a strategy, a tradeoff, a value judgment. We study them from the root and build something real with each one.</p>
+    <div class="hstats">
+      <div class="hstat"><span class="hn">12</span><span class="hl">Structures as<br>Projects</span></div>
+      <div class="hstat"><span class="hn">18</span><span class="hl">Weeks Deep<br>Building</span></div>
+      <div class="hstat"><span class="hn">0</span><span class="hl">LeetCode<br>Grind</span></div>
+      <div class="hstat"><span class="hn">3</span><span class="hl">Adventure<br>Tracks</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="philbar">
+  <div class="pb"><div class="pbletter">01</div><div class="pbtitle">Build First, Abstract Second</div><p class="pbbody">You implement a linked list before Java's LinkedList. A BST before TreeMap. Amy Ko's research: reading and understanding before writing creates deeper, transferable learning. Every abstraction is earned, not given.</p></div>
+  <div class="pb"><div class="pbletter">02</div><div class="pbtitle">Each Structure Is a Story</div><p class="pbbody">A stack isn't a data structure — it's your browser's back button, undo/redo, how compilers parse. Every structure gets a real story about the human problem it solved. Jeff Anderson: context before content.</p></div>
+  <div class="pb"><div class="pbletter">03</div><div class="pbtitle">No LeetCode Grind Culture</div><p class="pbbody">Speed-running 500 problems is hazing, not pedagogy. Ko's research shows it produces surface learning that doesn't transfer. Deep, meaningful projects instead. Understanding that serves you in 10 years.</p></div>
+</div>
+
+<hr class="rul">
+<div class="sw">
+  <div class="ol">Pedagogical Foundation</div>
+  <h2>How This Course <em>Actually Works</em></h2>
+  <p class="lead">Every design choice is grounded in research on how people learn to program. Projects over exams, depth over breadth, and critical questions about why each structure was invented — and whose problems it was designed to solve.</p>
+  <div class="pring">
+    <div class="prin"><div class="piicon">🧱</div><div class="pititle">Mini Project for Every Structure</div><p class="pibody">Every major data structure culminates in a project where you build something real. A stack becomes a text editor undo system. A graph becomes a campus navigator. You deploy, then reflect on what the structure revealed about itself.</p></div>
+    <div class="prin"><div class="piicon">🗺️</div><div class="pititle">Three-Track Adventure System</div><p class="pibody">Same core concept weekly, different depth. Novice Explorer: build and understand. Builder: rigor + analysis. Architect: proofs, research, edge cases. Tracks are starting points, not ceilings. Move up anytime.</p></div>
+    <div class="prin"><div class="piicon">📖</div><div class="pititle">Read Before Write (Amy Ko)</div><p class="pibody">Every new structure: trace existing implementations and predict behavior before writing. Ko's research shows this "read before write" approach dramatically improves debugging ability and structural intuition.</p></div>
+    <div class="prin"><div class="piicon">✊</div><div class="pititle">Critical History of Computation</div><p class="pibody">Who invented the hash table, and why? Which algorithm was credited to the wrong person? Whose foundational work was erased? Knowing the history makes structures meaningful, not arbitrary.</p></div>
+    <div class="prin"><div class="piicon">📂</div><div class="pititle">Portfolio + Ungrading (Jeff Anderson)</div><p class="pibody">No traditional exams. A living portfolio of every implementation, project, and reflection. You assign your own grade with evidence at the end. The 2-minute question rule: write a precise question before asking for help.</p></div>
+    <div class="prin"><div class="piicon">🌱</div><div class="pititle">Scaffolded Productive Struggle</div><p class="pibody">Ko's research: framing difficulty as authentic practice keeps learners engaged. Each project has three layers: working solution (required), efficient solution (encouraged), edge cases + analysis (for those ready). Work at your edge.</p></div>
+  </div>
+</div>
+
+
+<div class="sw" style="padding-top:0;padding-bottom:0;max-width:1300px;margin:0 auto;">
+  <div class="track-selector" role="group" aria-label="Choose learning track">
+    <button class="track-btn active" data-track="all" onclick="setTrack('all')" aria-pressed="true">☰ All Tracks</button>
+    <button class="track-btn" data-track="n" onclick="setTrack('n')" aria-pressed="false">🌱 Novice Explorer</button>
+    <button class="track-btn" data-track="b" onclick="setTrack('b')" aria-pressed="false">🔨 The Builder</button>
+    <button class="track-btn" data-track="a" onclick="setTrack('a')" aria-pressed="false">🔬 The Architect</button>
+  </div>
+</div>
+
+<div class="dsbanner">
+  <div><div class="ol" style="color:var(--gold)">The Core</div><h2>Every Structure<br>Is a <em>Mini Project</em></h2></div>
+  <p>Twelve data structures. Twelve projects. Each one teaches you to ask: why was this invented? What problem does it solve that the alternative can't? Who benefits when this runs in O(1)?</p>
+</div>
+
+<div class="dsg">
+  <!-- DS 01 -->
+  <div class="dsc"><div class="dsh"><div class="dsn">DS-01 · Arrays</div><div class="dscx">Access: O(1) · Insert: O(n)<br>Space: O(n)</div></div>
+  <div class="dsb"><div class="dsname">Arrays & Dynamic Arrays</div><div class="dssub">// Contiguous memory. The foundation of everything.</div>
+  <p class="dsdesc">You've used arrays without thinking about contiguous memory. Here we think about it. We build a dynamic array from scratch — doubling strategy, amortized O(1) pushes, the true cost of insertion. You earn Python's list.</p>
+  <div class="dsviz">arr = [ A | B | C | D | _ | _ ]  ← contiguous
+arr[2]       → O(1): base_addr + 2*size
+insert(1,X)  → O(n): shift C,D,_ right first
+push(E)      → O(1) amortized: just append</div>
+  <div class="dsproj"><div class="dsprojt">Mini Project: CSV Spreadsheet Engine</div><p class="dsprojb">2D dynamic array CSV processor. Sort by any column, filter, compute stats. Compare performance adding a million rows. Whose data exists in structured form — and whose doesn't?</p></div>
+  <div class="dstrk"><div class="dstr"><div class="dtl nov">Novice</div>Python lists. Build all features. Reflect on what happens at scale.</div><div class="dstr"><div class="dtl bld">Builder</div>DynamicArray class from scratch. Match Python list amortized behavior.</div><div class="dstr"><div class="dtl arc">Architect</div>Prove amortized O(1) via potential method. When does tripling beat doubling?</div></div>
+  <div class="dconn">🔗 NumPy, database tables, image pixels, time series data</div>
+        <button class="complete-btn" data-complete="ds01" onclick="toggleComplete('ds01')" aria-pressed="false">Mark Complete</button>
+        <button class="recall-btn" data-recall="ds01" onclick="toggleRecall('ds01')" aria-expanded="false">🧠 Quick Recall</button>
+        <div class="recall-box" id="recall-ds01" aria-hidden="true">
+          <strong>🧠 Quick Recall</strong>
+          <ul>
+            <li>Why is array access O(1)? What mathematical property enables this?</li>
+            <li>What is amortized O(1)? Give the intuition without a formula.</li>
+            <li>When would a linked list beat a dynamic array?</li>
+          </ul>
+        </div>
+        <div class="career-box"><strong>💼 Used In</strong><ul><li>Database Engines</li><li>NumPy / Pandas</li><li>Image Processing</li></ul></div>
+      </div></div>
+
+  <!-- DS 02 -->
+  <div class="dsc"><div class="dsh"><div class="dsn">DS-02 · Linked Lists</div><div class="dscx">Access: O(n) · Head insert: O(1)<br>Mid insert: O(n)</div></div>
+  <div class="dsb"><div class="dsname">Linked Lists</div><div class="dssub">// Nodes and pointers. Freedom from contiguity at a cost.</div>
+  <p class="dsdesc">An array is a neighborhood with numbered houses. A linked list is a treasure hunt — each house holds a note to the next. Fast at the front, slow everywhere else. We build singly, doubly, and circular. When is this actually better?</p>
+  <div class="dsviz">Head→[🐢|→]→[🦊|→]→[🦅|→]→null
+Insert at head: O(1) — just update pointer
+Find middle:    O(n) — must walk the chain
+Doubly: [←|🦊|→] — previous AND next node</div>
+  <div class="dsproj"><div class="dsprojt">Mini Project: Music Playlist System</div><p class="dsprojb">Doubly-linked playlist: play, skip, go back, shuffle (Fisher-Yates), loop. Why is doubly-linked perfect for "previous"? Benchmark vs. array on 10,000 songs.</p></div>
+  <div class="dstrk"><div class="dstr"><div class="dtl nov">Novice</div>Python Node class. All ops. Document why each pointer direction was chosen.</div><div class="dstr"><div class="dtl bld">Builder</div>Singly + doubly. LRU cache (linked list + hashmap). Floyd cycle detection.</div><div class="dstr"><div class="dtl arc">Architect</div>Prove Floyd's algorithm. Implement XOR linked list. Analyze cache locality.</div></div>
+  <div class="dconn">🔗 Browser history, undo stacks, OS scheduling, blockchain</div>
+        <button class="complete-btn" data-complete="ds02" onclick="toggleComplete('ds02')" aria-pressed="false">Mark Complete</button>
+        <button class="recall-btn" data-recall="ds02" onclick="toggleRecall('ds02')" aria-expanded="false">🧠 Quick Recall</button>
+        <div class="recall-box" id="recall-ds02" aria-hidden="true">
+          <strong>🧠 Quick Recall</strong>
+          <ul>
+            <li>Why is head insertion O(1) but middle insertion O(n)?</li>
+            <li>Explain Floyd's cycle detection without looking it up.</li>
+            <li>When would you choose doubly vs. singly linked?</li>
+          </ul>
+        </div>
+        <div class="career-box"><strong>💼 Used In</strong><ul><li>Browser History</li><li>OS Schedulers</li><li>LRU Cache</li></ul></div>
+      </div></div>
+
+  <!-- DS 03 -->
+  <div class="dsc"><div class="dsh"><div class="dsn">DS-03 · Stacks & Queues</div><div class="dscx">Push/Pop/Peek: O(1)<br>Enqueue/Dequeue: O(1)</div></div>
+  <div class="dsb"><div class="dsname">Stacks & Queues</div><div class="dssub">// LIFO and FIFO — ordering philosophies with profound consequences.</div>
+  <p class="dsdesc">You use stacks every time you hit Cmd-Z. Queues run every print job, task scheduler, and message broker. We implement both multiple ways and understand why the abstraction matters more than the underlying structure.</p>
+  <div class="dsviz">Stack (LIFO):     Queue (FIFO):
+push(A,B,C)       enq(A) enq(B) enq(C)
+pop()→C           deq()→A  ← first in, first out
+pop()→B           deq()→B
+← last in, first out  ← fairness encoded</div>
+  <div class="dsproj"><div class="dsprojt">Mini Project: Text Editor + Hospital Triage</div><p class="dsprojb">Part 1: Undo/redo with two stacks (command pattern). Part 2: Priority queue ER triage. Why does triage require priority, not FIFO? What does priority encoding say about whose emergency "counts more"?</p></div>
+  <div class="dstrk"><div class="dstr"><div class="dtl nov">Novice</div>Python lists. Both projects. What real systems near you use queues?</div><div class="dstr"><div class="dtl bld">Builder</div>Stack via linked list, queue via circular buffer. Monotonic stack problems.</div><div class="dstr"><div class="dtl arc">Architect</div>Prove queue via two stacks in amortized O(1). Van Emde Boas priority queue.</div></div>
+  <div class="dconn">🔗 Call stacks, browser history, compiler parsing, OS scheduling</div>
+        <button class="complete-btn" data-complete="ds03" onclick="toggleComplete('ds03')" aria-pressed="false">Mark Complete</button>
+        <button class="recall-btn" data-recall="ds03" onclick="toggleRecall('ds03')" aria-expanded="false">🧠 Quick Recall</button>
+        <div class="recall-box" id="recall-ds03" aria-hidden="true">
+          <strong>🧠 Quick Recall</strong>
+          <ul>
+            <li>What makes LIFO right for undo/redo? Explain the invariant.</li>
+            <li>Describe the shunting-yard algorithm in plain English.</li>
+            <li>How do two stacks simulate a queue in amortized O(1)?</li>
+          </ul>
+        </div>
+        <div class="career-box"><strong>💼 Used In</strong><ul><li>Compilers</li><li>OS Task Scheduler</li><li>Message Brokers</li></ul></div>
+      </div></div>
+
+  <!-- DS 04 -->
+  <div class="dsc"><div class="dsh"><div class="dsn">DS-04 · Hash Tables</div><div class="dscx">Access: O(1) avg · Worst: O(n)<br>Insert: O(1) avg</div></div>
+  <div class="dsb"><div class="dsname">Hash Tables</div><div class="dssub">// The most magical structure. O(1) lookup — when the hash cooperates.</div>
+  <p class="dsdesc">Hash tables are everywhere: Python dicts, database indexes, every set. We build from scratch, grapple with collisions (chaining vs. open addressing), understand load factors, and verify we've truly achieved O(1) on real data.</p>
+  <div class="dsviz">hash("cat")  = 7 → table[7] = "cat"
+hash("fish") = 7 → COLLISION!
+  Chaining:   table[7]→["cat","fish"]
+  Open addr:  probe next empty slot
+Load factor > 0.7 → resize and rehash</div>
+  <div class="dsproj"><div class="dsprojt">Mini Project: Word Frequency Analyzer</div><p class="dsprojb">Text analysis with your hash table. Frequency across a large corpus (novel, congressional record, your artist). Compare to sorted array. Critical: whose words count as "common"? Extend to detect plagiarism.</p></div>
+  <div class="dstrk"><div class="dstr"><div class="dtl nov">Novice</div>HashMap with chaining. Analyze your favorite artist's lyrics. What is "important"?</div><div class="dstr"><div class="dtl bld">Builder</div>Both collision strategies. Consistent hash ring for distributed caching.</div><div class="dstr"><div class="dtl arc">Architect</div>Prove expected O(1) under uniform hashing. Study SHA-256. Perfect hashing.</div></div>
+  <div class="dconn">🔗 Python dict, DB indexes, blockchain Merkle trees, password storage</div>
+        <button class="complete-btn" data-complete="ds04" onclick="toggleComplete('ds04')" aria-pressed="false">Mark Complete</button>
+        <button class="recall-btn" data-recall="ds04" onclick="toggleRecall('ds04')" aria-expanded="false">🧠 Quick Recall</button>
+        <div class="recall-box" id="recall-ds04" aria-hidden="true">
+          <strong>🧠 Quick Recall</strong>
+          <ul>
+            <li>Why is a good hash function critical? What breaks with a bad one?</li>
+            <li>When does O(1) average become O(n) worst case?</li>
+            <li>What load factor threshold should trigger a resize? Why?</li>
+          </ul>
+        </div>
+        <div class="career-box"><strong>💼 Used In</strong><ul><li>Database Indexes</li><li>Python Dict</li><li>Blockchain</li></ul></div>
+      </div></div>
+
+  <!-- DS 05 -->
+  <div class="dsc"><div class="dsh"><div class="dsn">DS-05 · Binary Trees & BST</div><div class="dscx">BST avg: O(log n) · Worst: O(n)<br>AVL: O(log n) guaranteed</div></div>
+  <div class="dsb"><div class="dsname">Binary Trees & BSTs</div><div class="dssub">// Hierarchy in pointers. The fastest search structure that stays sorted.</div>
+  <p class="dsdesc">A BST keeps data sorted for free — every insertion maintains the invariant. We implement from scratch, master all three traversals knowing WHY each order matters, face the degenerate case, and discover how balance changes everything.</p>
+  <div class="dsviz">        50      Inorder: 20,30,40,50,60,70,80 ← sorted!
+       /   \     Preorder: 50,30,20,40,70,60,80
+     30     70   Postorder: 20,40,30,60,80,70,50
+    / \    / \   ← WHICH order for file deletion?
+  20  40  60  80</div>
+  <div class="dsproj"><div class="dsprojt">Mini Project: File System Navigator</div><p class="dsprojb">BST-indexed command-line file explorer. Search by name, sort by size, type-filter, print tree. Then ask: how is a real file system different from a BST? What happens at a million files?</p></div>
+  <div class="dstrk"><div class="dstr"><div class="dtl nov">Novice</div>BST + all traversals. Build file explorer. Draw every tree on paper first.</div><div class="dstr"><div class="dtl bld">Builder</div>BST worst case → AVL with rotations. Compare heights empirically.</div><div class="dstr"><div class="dtl arc">Architect</div>Prove AVL maintains balance. Study red-black trees. Implement B-tree.</div></div>
+  <div class="dconn">🔗 File systems, DB B-trees, HTML DOM, ML decision trees</div></div></div>
+
+  <!-- DS 06 -->
+  <div class="dsc"><div class="dsh"><div class="dsn">DS-06 · Heaps</div><div class="dscx">Insert: O(log n) · Peek: O(1)<br>Extract-min: O(log n) · Build: O(n)</div></div>
+  <div class="dsb"><div class="dsname">Heaps & Priority Queues</div><div class="dssub">// "What's most important right now?" — answered in O(log n).</div>
+  <p class="dsdesc">A heap answers one question faster than anything: "what's the minimum?" Not arbitrary access — just the best element. We build a binary heap stored in an array (the elegant trick!), implement heapsort, and build a priority queue that solves real scheduling problems.</p>
+  <div class="dsviz">      100      Stored flat: [100,80,60,20,70]
+     /    \     parent(i) = (i-1)//2
+   80      60   left(i)   = 2*i+1
+  /  \    /     right(i)  = 2*i+2
+20   70  (spatial structure → index math!)</div>
+  <div class="dsproj"><div class="dsprojt">Mini Project: ER Triage Simulator</div><p class="dsprojb">Priority queue hospital simulation with re-prioritization. Full demo with edge cases. Critical: real clinical AI has encoded racial bias in severity scores (see Obermeyer et al. 2019). What would you audit before deploying this?</p></div>
+  <div class="dstrk"><div class="dstr"><div class="dtl nov">Novice</div>Python heapq. Build simulator. Reflect on algorithmically prioritizing human life.</div><div class="dstr"><div class="dtl bld">Builder</div>Binary heap from scratch. Decrease-key. Compare heapsort vs. quicksort.</div><div class="dstr"><div class="dtl arc">Architect</div>Prove heap construction O(n). Fibonacci heaps. Why Dijkstra needs decrease-key.</div></div>
+  <div class="dconn">🔗 OS scheduling, Dijkstra's algorithm, merge k sorted lists, A* search</div></div></div>
+
+  <!-- DS 07 Graphs FULL WIDTH -->
+  <div class="dsc fw"><div class="dsh"><div class="dsn">DS-07/08 · Graphs & Graph Algorithms</div><div class="dscx">BFS/DFS: O(V+E) · Dijkstra: O((V+E)logV) · Bellman-Ford: O(VE)</div></div>
+  <div class="dsb fw2">
+    <div><div class="dsname">Graphs</div><div class="dssub">// The most expressive structure. Relationships made computable.</div>
+    <p class="dsdesc">Graphs model everything: social networks, road maps, the internet, recommendation systems, disease spread. We study adjacency matrix vs. list, directed vs. undirected, weighted vs. unweighted. BFS, DFS, Dijkstra, topological sort.</p>
+    <div class="dsviz">  A ←── B ──→ D    BFS: level-by-level
+  │     │      ↑    DFS: deep+backtrack
+  ↓     ↓      │    Dijkstra: cheapest path
+  C ──→ E ─────┘   TopoSort: order deps</div>
+    <p class="dsdesc" style="margin-top:10px">The most important insight: the right algorithm depends entirely on what question you're asking. BFS finds shortest hops. Dijkstra finds cheapest path. Topological sort orders dependencies. The question determines the algorithm.</p></div>
+    <div>
+    <div class="dsproj"><div class="dsprojt">Mini Project: Campus Navigator + Social Network Analyzer</div><p class="dsprojb">Part 1: Dijkstra campus navigation — shortest paths, bottlenecks, visualization. Part 2: Social network — connected components, communities, degree distribution. Critical: what does a recommendation algorithm's graph encode about who "belongs together"?</p></div>
+    <div class="dstrk"><div class="dstr"><div class="dtl nov">Novice</div>Adjacency list, BFS, DFS. Map your campus. Which buildings are most "central"?</div><div class="dstr"><div class="dtl bld">Builder</div>Dijkstra + Bellman-Ford + topological sort. Dense vs. sparse runtime comparison.</div><div class="dstr"><div class="dtl arc">Architect</div>Prove Dijkstra correctness. Network flow. Social network surveillance analysis.</div></div>
+    <div class="dconn" style="margin-top:10px">🔗 GPS routing, social networks, package managers, web crawlers, fraud detection</div></div>
+  </div></div>
+
+  <!-- SORTING FULL WIDTH -->
+  <div class="dsc fw"><div class="dsh"><div class="dsn">ALGO-01 · Sorting</div><div class="dscx">Comparison lower bound: Ω(n log n) · Counting sort: O(n+k) · Python Timsort: hybrid</div></div>
+  <div class="dsb fw2">
+    <div><div class="dsname">The Sorting Story</div><div class="dssub">// Six algorithms. One question: what does "better" mean here?</div>
+    <p class="dsdesc">Bubble, Selection, Insertion, Merge, Quick, Counting/Radix. Each is a strategy with a story. The information-theoretic lower bound is the jewel: no comparison sort can beat O(n log n) worst-case. This is a theorem about the universe, not your skill.</p>
+    <div class="dsviz">Bubble:    O(n²)      simple, stable, slow
+Insertion: O(n)/O(n²) fast on nearly-sorted!
+Merge:     O(n log n) always, costs space
+Quick:     O(n log n) avg, O(n²) worst case
+Counting:  O(n+k)    only when k is small
+Python:    Timsort ← merge+insertion hybrid</div></div>
+    <div>
+    <div class="dsproj"><div class="dsprojt">Mini Project: Visualizer + Algorithm Recommendation Guide</div><p class="dsprojb">Animated sorting visualizer for all 6. Benchmark on 5 input distributions. Write a one-page recommendation guide for a non-technical audience. Critical: credit scores sort humans by risk. What should never be sorted algorithmically?</p></div>
+    <div class="dstrk"><div class="dstr"><div class="dtl nov">Novice</div>Bubble, selection, merge. Build visualizer. Write recommendation guide in plain language.</div><div class="dstr"><div class="dtl bld">Builder</div>All six. Implement Timsort. Document every performance anomaly on edge cases.</div><div class="dstr"><div class="dtl arc">Architect</div>Prove Ω(n log n) lower bound. Derive quicksort average-case. Study introsort.</div></div>
+    <div class="dconn" style="margin-top:10px">🔗 DB query optimization, Python sort(), search indexing, financial risk sorting</div></div>
+  </div></div>
+
+  <!-- DP FULL WIDTH -->
+  <div class="dsc fw"><div class="dsh"><div class="dsn">ALGO-02 · Dynamic Programming</div><div class="dscx">Requires: optimal substructure + overlapping subproblems → memoization or tabulation</div></div>
+  <div class="dsb fw2">
+    <div><div class="dsname">Dynamic Programming</div><div class="dssub">// Trading memory for time. The most elegant algorithmic technique.</div>
+    <p class="dsdesc">DP is not a data structure — it's a way of seeing. If a problem has optimal substructure and overlapping subproblems, solve it once and cache the answer. Fibonacci is the gateway. Edit distance is the real application. Once you see the pattern, it never leaves you.</p>
+    <div class="dsviz">Fibonacci naive:  O(2ⁿ) — recomputes fib(3) 21×
+Fibonacci memo:   O(n)  — compute once, reuse
+Template:
+  1. Define the subproblem clearly
+  2. Find the recurrence relation
+  3. Add memoization (top-down)
+  4. Convert to tabulation (bottom-up)</div></div>
+    <div>
+    <div class="dsproj"><div class="dsprojt">Mini Project: Spell Checker + DNA Aligner</div><p class="dsprojb">Part 1: Levenshtein edit distance spell checker. Part 2: Needleman-Wunsch DNA alignment. Both DP. Critical: test your spell checker on AAVE, technical slang, non-English names. Document every failure. Whose language is "correct"?</p></div>
+    <div class="dstrk"><div class="dstr"><div class="dtl nov">Novice</div>Fibonacci memo + 3 classic problems. Spell checker. Document dictionary assumptions.</div><div class="dstr"><div class="dtl bld">Builder</div>5+ DP problems. Memo vs. tabulation. DNA aligner. Optimize space to O(n).</div><div class="dstr"><div class="dtl arc">Architect</div>Prove optimal substructure. Approximation algorithms where DP is too slow. DP on trees.</div></div>
+    <div class="dconn" style="margin-top:10px">🔗 Bioinformatics, autocorrect, speech recognition, portfolio optimization, game AI</div></div>
+  </div></div>
+</div>
+
+<!-- 18-WEEK CALENDAR -->
+<hr class="rul">
+<div class="sw">
+  <div class="ol">18-Week Calendar</div>
+  <h2>Root to Branch,<br><em>Week by Week</em></h2>
+  <p class="lead">We build from the ground up — memory and Big-O first, then each structure in turn. Every unit ends with a mini project exhibition. The final three weeks belong to your capstone: a substantial system you build with your chosen structures.</p>
+  <div class="caltbl">
+    <div class="calth">
+      <div class="calthc">Wk</div>
+      <div class="calthc">Structure</div>
+      <div class="calthc">Core Concept + Analysis</div>
+      <div class="calthc">Project Milestone</div>
+      <div class="calthc">Critical Lens</div>
+    </div>
+    <div class="calunit u1">Unit I — Memory, Arrays & Linear Structures</div>
+    <div class="calrow"><div class="cwk"><span class="cwkn">01</span><span class="cwku">Unit I</span></div><div class="cc"><div class="ct">Memory + Big-O from Scratch</div><div class="cb">RAM model, asymptotic analysis. Why Big-O matters — and what it hides.</div><span class="tag tf">Foundational</span></div><div class="cc"><div class="ct">Count Operations, Then Generalize</div><div class="cb">Trace code, identify loops, recursion. Build intuition before formalism.</div></div><div class="cc"><div class="ct">Lab: Measure, Don't Guess</div><div class="cb">Time 5 functions on n/2n/4n. Plot curves. Document every surprise.</div><span class="tag tp">Project</span></div><div class="cc"><div class="ct">Whose Time Counts?</div><div class="cb">Big-O hides constants. On whose hardware is "fast" calibrated?</div></div></div>
+    <div class="calrow"><div class="cwk"><span class="cwkn">02</span><span class="cwku">Unit I</span></div><div class="cc"><div class="ct">Arrays + Dynamic Arrays</div><div class="cb">Contiguous memory, O(1) access, O(n) insert. Build dynamic array from scratch.</div><span class="tag tf">Foundational</span></div><div class="cc"><div class="ct">Amortized Analysis</div><div class="cb">Doubling → amortized O(1) push. Novice: observe. Architect: prove potential method.</div></div><div class="cc"><div class="ct">Project: Spreadsheet Engine</div><div class="cb">2D dynamic array CSV processor. Sort, filter, stats. Mini-demo to class.</div><span class="tag tp">Project</span></div><div class="cc"><div class="ct">What Gets Measured?</div><div class="cb">Whose lives are hard to put in structured form — and what disappears unmeasured?</div></div></div>
+    <div class="calrow"><div class="cwk"><span class="cwkn">03</span><span class="cwku">Unit I</span></div><div class="cc"><div class="ct">Linked Lists</div><div class="cb">Singly, doubly, circular. Trace before implementing. Ko: read before write.</div></div><div class="cc"><div class="ct">Traversal + Cycle Detection</div><div class="cb">Iterative and recursive. Reverse in place. Floyd's cycle detection algorithm.</div></div><div class="cc"><div class="ct">Project: Music Playlist</div><div class="cb">Doubly-linked playlist. Benchmark against array. Demo to class.</div><span class="tag tp">Project</span></div><div class="cc"><div class="ct">What Spotify Actually Uses</div><div class="cb">Production vs. classroom gap. What does the abstraction hide?</div></div></div>
+    <div class="calrow"><div class="cwk"><span class="cwkn">04</span><span class="cwku">Unit I</span></div><div class="cc"><div class="ct">Stacks & Queues</div><div class="cb">LIFO vs FIFO as ordering philosophies. Both via array and linked list.</div></div><div class="cc"><div class="ct">Call Stack + Expression Parsing</div><div class="cb">Why recursion uses a stack. Shunting-yard algorithm. Two stacks → calculator.</div></div><div class="cc"><div class="ct">Project: Text Editor Undo/Redo</div><div class="cb">Command pattern. Add hospital triage queue. Mini-exhibition.</div><span class="tag tp">Project</span></div><div class="cc"><div class="ct">Priority and Power</div><div class="cb">Queues encode fairness assumptions. Who designed this queue — and for whose workflow?</div></div></div>
+
+    <div class="calunit u2">Unit II — Hash Tables & Search & Sorting</div>
+    <div class="calrow"><div class="cwk"><span class="cwkn">05</span><span class="cwku">Unit II</span></div><div class="cc"><div class="ct">Hash Tables</div><div class="cb">Hash functions, collision resolution, load factors. Build from scratch to O(1).</div><span class="tag tf">Foundational</span></div><div class="cc"><div class="ct">Birthday Paradox + Internals</div><div class="cb">Expected collisions under uniform hashing. Python dict internals. The magic is math.</div></div><div class="cc"><div class="ct">Project: Word Frequency</div><div class="cb">Large text analysis. Compare to sorted array. Mini-exhibition.</div><span class="tag tp">Project</span></div><div class="cc"><div class="ct">What Gets Indexed?</div><div class="cb">Search engines are hash tables at scale. Safiya Noble on what content stays invisible.</div></div></div>
+    <div class="calrow"><div class="cwk"><span class="cwkn">06</span><span class="cwku">Unit II</span></div><div class="cc"><div class="ct">Binary Search + O(n²) Sorts</div><div class="cb">Invariant-based reasoning. Bubble, selection, insertion — build and analyze all three.</div></div><div class="cc"><div class="ct">Why O(n²) Fails at Scale</div><div class="cb">Timing curves: 1000 items fine, 1M catastrophic. Insertion sort wins on nearly-sorted.</div></div><div class="cc"><div class="ct">Visualizer Part 1</div><div class="cb">Animated visualizer for O(n²) sorts. Benchmark 3 input shapes.</div><span class="tag tp">Project</span></div><div class="cc"><div class="ct">Sorting Human Lives</div><div class="cb">Credit scores sort people by risk. What data goes in? What should never be sorted?</div></div></div>
+    <div class="calrow"><div class="cwk"><span class="cwkn">07</span><span class="cwku">Unit II</span></div><div class="cc"><div class="ct">Merge Sort + Quick Sort</div><div class="cb">Divide and conquer. Merge: always O(n log n). Quick: pivot problem + randomization.</div><span class="tag tf">Foundational</span></div><div class="cc"><div class="ct">Recurrence Relations</div><div class="cb">T(n)=2T(n/2)+O(n) → O(n log n). Master theorem. Derive, don't just state.</div></div><div class="cc"><div class="ct">Visualizer Part 2 + Guide</div><div class="cb">Add merge + quicksort. Write recommendation guide for non-technical audience.</div><span class="tag tp">Project</span></div><div class="cc"><div class="ct">Information-Theoretic Bound</div><div class="cb">No comparison sort beats O(n log n). A theorem about the universe. What does impossibility teach us?</div></div></div>
+    <div class="calrow" style="background:rgba(0,0,0,.015)"><div class="cwk"><span class="cwkn">08</span><span class="cwku">Mid-I</span></div><div class="cc"><div class="ct">Mini Exhibition I</div><div class="cb">Present best project from Units I–II. Peer feedback. Self-evaluation.</div><span class="tag te">Exhibition</span></div><div class="cc"><div class="ct">Portfolio Checkpoint</div><div class="cb">Learning conference. Identify 2 concepts to deepen. Adjust track if needed.</div></div><div class="cc"><div class="ct">Capstone Pitch</div><div class="cb">Pitch your final system. Begin scoping which structures and why.</div><span class="tag tp">Project</span></div><div class="cc"><div class="ct">Who Builds This Field?</div><div class="cb">CS demographics survey. Whose problems get solved first? What changes when rooms change?</div></div></div>
+
+    <div class="calunit u3">Unit III — Trees & Balanced Structures</div>
+    <div class="calrow"><div class="cwk"><span class="cwkn">09</span><span class="cwku">Unit III</span></div><div class="cc"><div class="ct">Binary Trees + BSTs</div><div class="cb">Tree terminology, all 3 traversals (know WHY each order). BST property. Trace before implement.</div><span class="tag tf">Foundational</span></div><div class="cc"><div class="ct">BST Analysis + Degenerate Case</div><div class="cb">All ops O(h). Sorted insertion → O(n). Why balance changes everything.</div></div><div class="cc"><div class="ct">Project: File System Navigator</div><div class="cb">BST-indexed file explorer. Search, sort, type-filter, print tree. Demo to class.</div><span class="tag tp">Project</span></div><div class="cc"><div class="ct">File Systems as Power</div><div class="cb">What determines the hierarchy? Who designed the folder structure you navigate daily?</div></div></div>
+    <div class="calrow"><div class="cwk"><span class="cwkn">10</span><span class="cwku">Unit III</span></div><div class="cc"><div class="ct">Balanced Trees: AVL</div><div class="cb">Why BST worst case is unacceptable in production. AVL rotations. Guaranteed O(log n).</div></div><div class="cc"><div class="ct">Rotations + Invariant Maintenance</div><div class="cb">L, R, LR, RL rotations. Novice: trace visually. Architect: prove rotation maintains invariant.</div></div><div class="cc"><div class="ct">BST vs AVL Benchmark</div><div class="cb">Worst-case input for BST. Measure height. Compare AVL on same input.</div><span class="tag tp">Project</span></div><div class="cc"><div class="ct">Java's TreeMap is Red-Black</div><div class="cb">Why did Java choose red-black over AVL? What tradeoffs did the designers make, and for whom?</div></div></div>
+    <div class="calrow"><div class="cwk"><span class="cwkn">11</span><span class="cwku">Unit III</span></div><div class="cc"><div class="ct">Heaps + Priority Queues</div><div class="cb">Binary heap flat in array. Sift-up, sift-down, build-heap O(n). The elegant index math.</div><span class="tag tf">Foundational</span></div><div class="cc"><div class="ct">Heapsort + Decrease-Key</div><div class="cb">Heapsort O(n log n), O(1) space. Decrease-key operation. Why Dijkstra needs it.</div></div><div class="cc"><div class="ct">Project: ER Triage Simulator</div><div class="cb">Priority queue simulation. Re-prioritization. Full demo. What does your severity score encode?</div><span class="tag tp">Project</span></div><div class="cc"><div class="ct">Clinical AI Bias</div><div class="cb">Obermeyer et al. 2019 (Science): clinical AI encoded racial bias in severity scores. What would you audit?</div><span class="tag tc">Critical</span></div></div>
+    <div class="calrow"><div class="cwk"><span class="cwkn">12</span><span class="cwku">Unit III</span></div><div class="cc"><div class="ct">Tries + Union-Find</div><div class="cb">Prefix trees O(m) ops. Compressed tries. Union-find with path compression → O(α(n)) ≈ O(1).</div></div><div class="cc"><div class="ct">Advanced Structure Analysis</div><div class="cb">Inverse Ackermann function. Segment trees for range queries. When each structure is appropriate.</div></div><div class="cc"><div class="ct">Project: Autocomplete Engine</div><div class="cb">Trie autocomplete trained on your community's vocabulary. Document what standard lists erase.</div><span class="tag tp">Project</span></div><div class="cc"><div class="ct">Whose Language Is "Correct"?</div><div class="cb">Autocorrect "fixes" names it doesn't recognize. Who made the dictionary? Who is harmed?</div><span class="tag tc">Critical</span></div></div>
+
+    <div class="calunit u4">Unit IV — Graphs & Dynamic Programming</div>
+    <div class="calrow"><div class="cwk"><span class="cwkn">13</span><span class="cwku">Unit IV</span></div><div class="cc"><div class="ct">Graph Fundamentals + BFS/DFS</div><div class="cb">Adjacency matrix vs. list. BFS: shortest hops. DFS: deep exploration. Both O(V+E).</div><span class="tag tf">Foundational</span></div><div class="cc"><div class="ct">What Question Are You Asking?</div><div class="cb">BFS ≠ Dijkstra ≠ DFS. The question determines the algorithm. This is the central graph insight.</div></div><div class="cc"><div class="ct">Campus Graph: Build + Explore</div><div class="cb">Model your campus. Find connected components. BFS: which buildings in 3 hops?</div><span class="tag tp">Project</span></div><div class="cc"><div class="ct">Graphs as Infrastructure</div><div class="cb">Power grids, roads — all graphs. Whose neighborhoods have fewer edges in every infrastructure graph?</div></div></div>
+    <div class="calrow"><div class="cwk"><span class="cwkn">14</span><span class="cwku">Unit IV</span></div><div class="cc"><div class="ct">Dijkstra + Topological Sort</div><div class="cb">Dijkstra: greedy shortest path O((V+E)logV). Kahn's algorithm for topological sort.</div></div><div class="cc"><div class="ct">MST: Kruskal's + Prim's</div><div class="cb">Kruskal's with Union-Find. Prim's with heap. When do minimum spanning trees matter?</div></div><div class="cc"><div class="ct">Campus Navigator + Dep Resolver</div><div class="cb">Dijkstra on campus + course dependency resolver with topological sort.</div><span class="tag tp">Project</span></div><div class="cc"><div class="ct">GPS Routing + Redlining</div><div class="cb">Studies show routing algorithms can reflect historical redlining. What graph weights encode is a design choice.</div><span class="tag tc">Critical</span></div></div>
+    <div class="calrow"><div class="cwk"><span class="cwkn">15</span><span class="cwku">Unit IV</span></div><div class="cc"><div class="ct">Dynamic Programming</div><div class="cb">Optimal substructure + overlapping subproblems. Memo vs. tabulation. Fibonacci gateway.</div><span class="tag tf">Foundational</span></div><div class="cc"><div class="ct">Classic DP Problems</div><div class="cb">Edit distance, LCS, knapsack, coin change. Each reveals a new way to define "subproblem."</div></div><div class="cc"><div class="ct">Project: Spell Checker + DNA Aligner</div><div class="cb">Levenshtein spell check. Needleman-Wunsch alignment. Test on your community's vocabulary.</div><span class="tag tp">Project</span></div><div class="cc"><div class="ct">Edit Distance Is Political</div><div class="cb">Edit distance defines "closeness." The dictionary defines "correct." Both are design choices. Whose names get "corrected"?</div><span class="tag tc">Critical</span></div></div>
+
+    <div class="calunit u5">Capstone — Final Weeks: Build Something Real</div>
+    <div class="calrow"><div class="cwk"><span class="cwkn">16</span><span class="cwku">Cap</span></div><div class="cc"><div class="ct">Capstone Studio Week</div><div class="cb">Dedicated build time. Must use 3+ data structures and 2+ algorithms. Learning conference check-ins.</div></div><div class="cc"><div class="ct">Algorithm Strategy Review</div><div class="cb">Greedy, D&amp;C, DP, backtracking. Which fits your problem? Can you justify the choice?</div></div><div class="cc"><div class="ct">Capstone Code Review</div><div class="cb">Ko's structured peer review protocol. 3 warm + 3 cool feedback. Read first, trace second.</div><span class="tag tp">Project</span></div><div class="cc"><div class="ct">Design Decisions Are Values</div><div class="cb">Every O(1) insert is an O(n) access somewhere. What did you optimize for — and for whom?</div></div></div>
+    <div class="calrow"><div class="cwk"><span class="cwkn">17</span><span class="cwku">Final</span></div><div class="cc"><div class="ct">Capstone Exhibition — Day 1</div><div class="cb">Community showcase. Present your system: what you built, which structures, what you'd change.</div><span class="tag te">Exhibition</span></div><div class="cc"><div class="ct">Portfolio + Learning Conference</div><div class="cb">Individual meeting: present portfolio, assign grade with evidence.</div></div><div class="cc"><div class="ct">Portfolio Due</div><div class="cb">All implementations, write-ups, traces, reflections, final self-evaluation + grade.</div></div><div class="cc"><div class="ct">What Carries Forward?</div><div class="cb">Not the code — the thinking. The habit of asking: what is this optimized for, and for whose use case?</div></div></div>
+    <div class="calrow"><div class="cwk"><span class="cwkn">18</span><span class="cwku">Finale</span></div><div class="cc"><div class="ct">Capstone Exhibition — Day 2</div><div class="cb">Remaining presentations. Celebration. What does CS 210 leave in you — and what do you leave in it?</div><span class="tag te">Exhibition</span></div><div class="cc"><div class="ct">Where Do You Go Next?</div><div class="cb">Transfer pathways, careers, open-source, organizations using DSA for social good.</div></div><div class="cc"><div class="ct">Course Co-Evaluation</div><div class="cb">You evaluate the course. Your feedback co-creates the next version. Freire's dialogic education.</div></div><div class="cc"><div class="ct">Final Reflection</div><div class="cb">Every structure was invented to solve a human problem. What problem would you invent a structure to solve?</div></div></div>
+  </div>
+</div>
+
+<div class="linwrap">
+  <div class="ol">Intellectual Lineage</div>
+  <h2>Standing on the<br><em>Shoulders of Thinkers</em></h2>
+  <div class="ling">
+    <div class="lc"><div class="lname">Amy J. Ko</div><div class="lrole">Computing Education</div><p class="lbody">Equitable, joyous, liberatory computing education. Read before write. Scaffolded struggle. CS assessments aren't fair — so we don't use traditional ones.</p></div>
+    <div class="lc"><div class="lname">Jeff Anderson</div><div class="lrole">Pedagogy</div><p class="lbody">Ungrading, deep vs. surface learning, Conquering College. Context before content. You are the world's leading expert on your own learning.</p></div>
+    <div class="lc"><div class="lname">Paulo Freire</div><div class="lrole">Liberatory Ed.</div><p class="lbody">Pedagogy of the Oppressed. Students are not empty vessels. Knowledge is liberation. The classroom is a site of political transformation.</p></div>
+    <div class="lc"><div class="lname">bell hooks</div><div class="lrole">Liberatory Ed.</div><p class="lbody">Teaching to Transgress. The classroom as a site of freedom. Education that crosses boundaries of race, gender, and class.</p></div>
+    <div class="lc"><div class="lname">Donald Knuth</div><div class="lrole">TAOCP</div><p class="lbody">The Art of Computer Programming. Mathematical rigor applied to algorithms. Every algorithm has a story — Knuth tells them all.</p></div>
+    <div class="lc"><div class="lname">Edsger Dijkstra</div><div class="lrole">Algorithms</div><p class="lbody">Shortest path. Structured programming. "Computer science is no more about computers than astronomy is about telescopes."</p></div>
+    <div class="lc"><div class="lname">Safiya Noble</div><div class="lrole">Critical Tech</div><p class="lbody">Algorithms of Oppression. Search algorithms encode whose knowledge is findable — and whose is buried.</p></div>
+    <div class="lc"><div class="lname">Robert Tarjan</div><div class="lrole">Graph Algorithms</div><p class="lbody">Union-Find analysis. DFS tree algorithms. Some of the most beautiful algorithmic results in computer science history.</p></div>
+  </div>
+</div>
+
+<hr class="rul">
+<div class="sw">
+  <div class="ol">Portfolio + Ungrading</div>
+  <h2>You Assign Your Grade.<br><em>Here's the System.</em></h2>
+  <p class="lead">Adapted from Jeff Anderson's ungrading practice. The goal is not to perform mastery for a grade. The goal is to build real understanding that serves you in 10 years. Evidence of learning — not test scores — is the only currency.</p>
+  <div class="aswrap">
+    <div class="asl"><h3>Your Learning Portfolio</h3>
+    <p style="font-size:13px;line-height:1.75;color:rgba(250,246,240,.6);margin-bottom:18px">A living document of your journey — not a polished showcase, but a process record. First attempts, failures, revised understanding. All of it belongs here.</p>
+    <ul class="aslist">
+      <li>Every implementation with traced examples and documented thinking</li>
+      <li>Concept notes in your own words before technical language</li>
+      <li>Mini project write-ups: built, failed, would rebuild</li>
+      <li>Complexity analyses: derive from scratch, don't just state</li>
+      <li>Critical essays: who built this, for whom, what does it encode?</li>
+      <li>Bi-weekly learning reflections</li>
+      <li>Evidence of peer teaching and feedback given</li>
+      <li>"Conquering College" meta-learning log</li>
+    </ul></div>
+    <div class="asr"><h3>Three Feedback Sources</h3>
+    <p style="font-size:13px;line-height:1.75;color:var(--brown);margin-bottom:18px">You receive feedback from three sources. The instructor is the smallest — mirroring how professional software engineers actually work.</p>
+    <ul class="aslist">
+      <li><strong>Self-directed:</strong> 2-minute question rule. Check implementations against traced examples. Document your own errors and the reasoning behind each fix.</li>
+      <li><strong>Peer code review:</strong> Structured weekly review using Ko's read-first protocol. Warm and cool feedback. No debugging for each other — only clarifying questions that help them find it.</li>
+      <li><strong>Instructor conferences:</strong> Bi-weekly 15-min coaching sessions. Forward-looking, specific. Not a grade — a conversation about what's working and what to deepen.</li>
+      <li><strong>You assign your grade:</strong> Final self-evaluation with evidence. You present the case. If the work is there and documented, it's confirmed. This is trust-based education.</li>
+    </ul></div>
+  </div>
+</div>
+
+
+<section class="succeed-section" id="succeed" aria-label="How to succeed">
+  <div class="ol">Learning Strategy</div>
+  <h2>How to Succeed in <em>Data Structures</em></h2>
+  <p class="lead" style="margin-bottom:0;">These strategies come directly from Amy Ko's research on expert programmers and Jeff Anderson's deep-learning pedagogy. They apply to DSA specifically.</p>
+  <div class="succeed-grid">
+    <div class="succeed-card"><div class="succeed-num">01</div><div class="succeed-title">Draw Before You Code</div><p class="succeed-body">For every new structure, draw it on paper with 4–5 elements before touching a keyboard. Insert, delete, and search by hand. The diagram reveals what the code hides.</p></div>
+    <div class="succeed-card"><div class="succeed-num">02</div><div class="succeed-title">Trace Every Operation</div><p class="succeed-body">Amy Ko's "read before write": trace through an existing implementation line by line before writing your own. Predict what each line does. Confusion here is data — write it down.</p></div>
+    <div class="succeed-card"><div class="succeed-num">03</div><div class="succeed-title">Derive Complexity, Don't Memorize</div><p class="succeed-body">Don't memorize "BST is O(log n)." Derive it: at each level, you eliminate half the tree. If you can't derive it, you can't apply it. Derivation transfers. Memorization doesn't.</p></div>
+    <div class="succeed-card"><div class="succeed-num">04</div><div class="succeed-title">Build the Library Version Last</div><p class="succeed-body">The rule in this course: you cannot use java.util.LinkedList until you've built one. You cannot call Collections.sort() until you can explain why it's O(n log n). Every abstraction is earned.</p></div>
+    <div class="succeed-card"><div class="succeed-num">05</div><div class="succeed-title">Find the Real-World Analog</div><p class="succeed-body">Every structure is a metaphor. A queue is a checkout line. A heap is a hospital triage system. A graph is a road network. If you can't name the real-world analog, you don't understand the structure.</p></div>
+    <div class="succeed-card"><div class="succeed-num">06</div><div class="succeed-title">Ask Who Designed This</div><p class="succeed-body">Every structure was invented to solve a specific problem, by specific people, for specific use cases. Knowing the history makes the structure real — not an arbitrary fact to memorize, but a decision someone made.</p></div>
+  </div>
+</section>
+
+<section class="concept-map-section" id="concept-map" aria-label="Concept map">
+  <div class="ol">How It All Connects</div>
+  <h2>The DSA <em>Concept Map</em></h2>
+  <p class="lead" style="margin-bottom:32px;">Every structure and algorithm in this course connects. Here's the web that holds it together.</p>
+  <div class="concept-flows">
+    <div class="concept-flow"><div class="concept-flow-label">Memory Foundation</div>RAM Model → Big-O<br><span class="arrow">↓</span> Arrays + Dynamic Arrays<br><span class="arrow">↓</span> Amortized Analysis<br><span class="arrow">↓</span> Every Structure</div>
+    <div class="concept-flow"><div class="concept-flow-label">Linear Structures</div>Arrays → Linked Lists<br><span class="arrow">↓</span> Stacks + Queues<br><span class="arrow">↓</span> Hash Tables<br><span class="arrow">↓</span> O(1) Operations</div>
+    <div class="concept-flow"><div class="concept-flow-label">Tree Hierarchy</div>Binary Trees → BST<br><span class="arrow">↓</span> AVL / Red-Black<br><span class="arrow">↓</span> Heaps + Tries<br><span class="arrow">↓</span> O(log n) Guaranteed</div>
+    <div class="concept-flow"><div class="concept-flow-label">Graph Theory</div>Graphs → BFS / DFS<br><span class="arrow">↓</span> Dijkstra + MST<br><span class="arrow">↓</span> Topological Sort<br><span class="arrow">↓</span> Everything Is a Graph</div>
+    <div class="concept-flow"><div class="concept-flow-label">Algorithm Design</div>Brute Force → Greedy<br><span class="arrow">↓</span> Divide + Conquer<br><span class="arrow">↓</span> Dynamic Programming<br><span class="arrow">↓</span> Impossibility Bounds</div>
+    <div class="concept-flow"><div class="concept-flow-label">Critical Thread</div>Who designed this?<br><span class="arrow">↓</span> What is optimized?<br><span class="arrow">↓</span> For whose use case?<br><span class="arrow">↓</span> What does it encode?</div>
+  </div>
+</section>
+
+<section class="datasets-section" id="datasets" aria-label="Practice datasets">
+  <div class="ol">Real Data</div>
+  <h2>Practice with <em>Real Datasets</em></h2>
+  <p class="lead" style="margin-bottom:32px;">Every data structure should be practiced on data with real-world stakes. These datasets are curated for DSA projects that matter.</p>
+  <div class="dataset-grid">
+    <div class="dataset-item"><div class="dataset-name">OpenStreetMap (Bay Area)</div><p class="dataset-desc">Real road network graph for campus navigation, Dijkstra, and MST projects. Build your own routing system on actual streets.</p><a class="dataset-link" href="https://www.openstreetmap.org" target="_blank" rel="noopener">→ Get Dataset</a></div>
+    <div class="dataset-item"><div class="dataset-name">Project Gutenberg</div><p class="dataset-desc">50,000+ free books. Excellent for trie autocomplete, hash table word frequency, and edit-distance spell-checking projects. Train on any language.</p><a class="dataset-link" href="https://www.gutenberg.org/cache/epub/feeds/" target="_blank" rel="noopener">→ Get Dataset</a></div>
+    <div class="dataset-item"><div class="dataset-name">UCSC Genome Browser</div><p class="dataset-desc">DNA sequences for the dynamic programming alignment project. Real genomic data from the institution that pioneered open genome access.</p><a class="dataset-link" href="https://genome.ucsc.edu" target="_blank" rel="noopener">→ Get Dataset</a></div>
+    <div class="dataset-item"><div class="dataset-name">Wikipedia Graph Dump</div><p class="dataset-desc">Hyperlink network of Wikipedia articles as a directed graph. BFS finds shortest path between any two topics. Reveals knowledge structure.</p><a class="dataset-link" href="https://dumps.wikimedia.org" target="_blank" rel="noopener">→ Get Dataset</a></div>
+    <div class="dataset-item"><div class="dataset-name">IPEDS (College Data)</div><p class="dataset-desc">Enrollment, completion, and cost data for every US college. Sort, search, and analyze which institutions serve which communities.</p><a class="dataset-link" href="https://nces.ed.gov/ipeds/use-the-data" target="_blank" rel="noopener">→ Get Dataset</a></div>
+    <div class="dataset-item"><div class="dataset-name">Spotify Million Playlist</div><p class="dataset-desc">Graph-structure playlist data. Model songs as nodes, co-occurrence as edges. Build a recommendation system using graph traversal.</p><a class="dataset-link" href="https://www.aicrowd.com/challenges/spotify-million-playlist-dataset-challenge" target="_blank" rel="noopener">→ Get Dataset</a></div>
+  </div>
+</section>
+
+<section class="badges-section" id="badges" aria-label="Mastery badges">
+  <div class="ol" style="color:var(--gold)">Mastery</div>
+  <h2>Earn Your <em>Structure Badge</em></h2>
+  <p class="lead" style="color:rgba(250,246,240,.5);font-size:15px;margin-bottom:32px;">Complete mini projects to unlock badges. Tracked locally in your browser — a record of your building, not your grade.</p>
+  <div class="badge-grid">
+    <div class="badge-item" id="badge-novice"><span class="badge-icon">🌱</span><div class="badge-name">Applied Engineer</div><div class="badge-status">Complete 4+ units</div></div>
+    <div class="badge-item" id="badge-builder"><span class="badge-icon">🔨</span><div class="badge-name">Systems Builder</div><div class="badge-status">Complete 8+ units</div></div>
+    <div class="badge-item" id="badge-architect"><span class="badge-icon">🔬</span><div class="badge-name">Algorithm Architect</div><div class="badge-status">Complete all 12 units</div></div>
+  </div>
+</section>
+
+<footer>
+  <div class="flay">
+    <div>
+      <div class="fbig">CS 210 —<br><em>Data Structures</em><br>&amp; Algorithms</div>
+      <div class="fmeta">Foothill College · West Valley College · 4 Units · 18 Weeks<br>Project-Based · Liberatory Education · Portfolio + Ungrading<br>All resources free · No required textbook to purchase</div>
+    </div>
+    <div class="fcol"><h4>Informed By</h4><ul><li>Dr. Amy J. Ko (UW iSchool)</li><li>Jeff Anderson</li><li>Paulo Freire</li><li>bell hooks</li><li>Donald Knuth (TAOCP)</li><li>Safiya Umoja Noble</li><li>Robert Sedgewick</li></ul></div>
+    <div class="fcol"><h4>Free Resources</h4><ul><li>OpenDSA (opendsa.org)</li><li>Princeton Algorithms Course</li><li>Visualgo.net (tracing)</li><li>CS50 Data Structures</li><li>PythonTutor.com</li><li>Karpathy's micrograd</li><li>CLRS (library)</li></ul></div>
+  </div>
+  <div class="fbot"><span>CS 210 — Data Structures &amp; Algorithms</span><span>Every structure is an argument · Build it to understand the argument</span></div>
+</footer>
+<script src="js/progress.js"></script>
+</body>
+</html>

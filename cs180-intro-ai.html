@@ -1,0 +1,2076 @@
+<!DOCTYPE html>
+<html lang="en" data-course="cs180">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CS 180 — Introduction to Artificial Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@300;400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0d0d0d;
+    --paper: #f5f0e8;
+    --cream: #ede8d8;
+    --red: #c1121f;
+    --orange: #e36414;
+    --gold: #d4a017;
+    --teal: #0a7c6e;
+    --dim: #5a5a5a;
+    --rule: 2px solid var(--ink);
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ── GRAIN OVERLAY ── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: .03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
+
+  /* ── NEWSPAPER HEADER ── */
+  .masthead {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 0;
+    border-bottom: 6px solid var(--red);
+  }
+  .masthead-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 48px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+  .masthead-main {
+    padding: 32px 48px 24px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 24px;
+  }
+  .masthead-left {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    line-height: 2;
+    opacity: 0.65;
+  }
+  .masthead-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(56px, 8vw, 110px);
+    letter-spacing: 0.02em;
+    line-height: 0.9;
+    text-align: center;
+    color: var(--paper);
+  }
+  .masthead-title span {
+    color: var(--red);
+  }
+  .masthead-right {
+    text-align: right;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    line-height: 2;
+    opacity: 0.65;
+  }
+  .masthead-sub {
+    text-align: center;
+    padding: 14px 48px;
+    background: var(--red);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: white;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    min-height: 80vh;
+    border-bottom: var(--rule);
+  }
+  .hero-left {
+    padding: 64px 48px;
+    border-right: var(--rule);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: var(--ink);
+    color: var(--paper);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-left::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(193,18,31,0.15), transparent 70%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 32px;
+    height: 1px;
+    background: var(--red);
+  }
+  .hero-headline {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(36px, 4.5vw, 66px);
+    line-height: 1.05;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .hero-headline em {
+    color: var(--orange);
+    font-style: italic;
+  }
+  .hero-deck {
+    font-size: 15px;
+    line-height: 1.8;
+    color: rgba(245,240,232,0.7);
+    max-width: 480px;
+    margin-top: 32px;
+    font-weight: 300;
+  }
+  .hero-right {
+    padding: 48px;
+    background: var(--cream);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* ── NEURAL NET SVG ANIMATION ── */
+  #neural-canvas {
+    width: 100%;
+    max-width: 400px;
+  }
+  .node { fill: var(--ink); }
+  .node-active { fill: var(--red); animation: pulse 2s ease-in-out infinite; }
+  .edge { stroke: var(--ink); stroke-width: 1; opacity: 0.2; }
+  .edge-active {
+    stroke: var(--red);
+    stroke-width: 1.5;
+    opacity: 0;
+    stroke-dasharray: 8 4;
+    animation: dash-flow 2.5s linear infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; r: 6; }
+    50% { opacity: 1; r: 8; }
+  }
+  @keyframes dash-flow {
+    0% { stroke-dashoffset: 60; opacity: 0; }
+    20% { opacity: 0.8; }
+    80% { opacity: 0.8; }
+    100% { stroke-dashoffset: 0; opacity: 0; }
+  }
+  .node-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    fill: var(--dim);
+  }
+
+  .hero-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 32px;
+    width: 100%;
+    max-width: 400px;
+  }
+  .stat {
+    background: white;
+    border: 1px solid var(--ink);
+    padding: 16px;
+  }
+  .stat-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 38px;
+    line-height: 1;
+    color: var(--red);
+  }
+  .stat-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-top: 4px;
+  }
+
+  /* ── SECTION LAYOUT ── */
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 48px; }
+  
+  section { padding: 80px 48px; max-width: 1280px; margin: 0 auto; }
+  
+  .section-rule {
+    border: none;
+    border-top: var(--rule);
+    margin: 0;
+  }
+  
+  .section-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 24px;
+  }
+  .section-tag::after {
+    content: '';
+    display: inline-block;
+    width: 40px;
+    height: 1px;
+    background: var(--red);
+  }
+
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(32px, 4vw, 54px);
+    line-height: 1.05;
+    margin-bottom: 24px;
+  }
+  h2 em { color: var(--red); font-style: italic; }
+
+  .lead {
+    font-size: 17px;
+    line-height: 1.85;
+    color: var(--dim);
+    max-width: 680px;
+    font-weight: 300;
+    margin-bottom: 56px;
+  }
+
+  /* ── PHILOSOPHY COLUMNS ── */
+  .phil-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border: var(--rule);
+  }
+  .phil-card {
+    padding: 36px 32px;
+    border-right: var(--rule);
+    transition: background 0.2s;
+  }
+  .phil-card:last-child { border-right: none; }
+  .phil-card:hover { background: var(--ink); color: var(--paper); }
+  .phil-card:hover .phil-num { color: var(--red); }
+  .phil-card:hover .phil-body { color: rgba(245,240,232,0.65); }
+  .phil-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    line-height: 1;
+    color: var(--cream);
+    margin-bottom: 8px;
+    transition: color 0.2s;
+  }
+  .phil-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    margin-bottom: 12px;
+  }
+  .phil-body {
+    font-size: 13.5px;
+    line-height: 1.75;
+    color: var(--dim);
+    transition: color 0.2s;
+  }
+
+  /* ── LINEAGE STRIP ── */
+  .lineage {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 48px;
+    border-top: 4px solid var(--gold);
+    border-bottom: 4px solid var(--gold);
+  }
+  .lineage h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.1em;
+    color: var(--gold);
+    margin-bottom: 28px;
+  }
+  .lineage-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+  }
+  .lineage-item {
+    border-left: 2px solid var(--gold);
+    padding-left: 14px;
+  }
+  .lineage-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 16px;
+    color: var(--gold);
+  }
+  .lineage-desc {
+    font-size: 12px;
+    color: rgba(245,240,232,0.55);
+    margin-top: 4px;
+    line-height: 1.6;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* ── TRACKS ── */
+  .tracks-wrap {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border: var(--rule);
+    border-bottom: none;
+  }
+  .track {
+    border-right: var(--rule);
+    border-bottom: var(--rule);
+  }
+  .track:last-child { border-right: none; }
+  .track-header {
+    padding: 28px 32px;
+    border-bottom: var(--rule);
+    position: relative;
+    overflow: hidden;
+  }
+  .track.novice .track-header { background: #eaf4f0; }
+  .track.builder .track-header { background: #fff3e0; }
+  .track.architect .track-header { background: #fce8e8; }
+  .track-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .track.novice .track-label { color: var(--teal); }
+  .track.builder .track-label { color: var(--orange); }
+  .track.architect .track-label { color: var(--red); }
+  .track-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+  }
+  .track-tagline {
+    font-size: 12px;
+    color: var(--dim);
+    font-style: italic;
+    margin-top: 6px;
+  }
+  .track-accent {
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 80px;
+    opacity: 0.08;
+    line-height: 1;
+  }
+  .track-body { padding: 28px 32px; }
+  .track-body p {
+    font-size: 13.5px;
+    line-height: 1.75;
+    color: var(--dim);
+    margin-bottom: 20px;
+  }
+  .project-list { list-style: none; }
+  .project-list li {
+    padding: 11px 0;
+    border-top: 1px solid var(--cream);
+    font-size: 12.5px;
+    line-height: 1.5;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .project-list li .proj-icon {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+  }
+  .final-project {
+    margin-top: 20px;
+    padding: 16px;
+    font-size: 12px;
+    line-height: 1.6;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .track.novice .final-project { background: #eaf4f0; border-left: 3px solid var(--teal); }
+  .track.builder .final-project { background: #fff3e0; border-left: 3px solid var(--orange); }
+  .track.architect .final-project { background: #fce8e8; border-left: 3px solid var(--red); }
+
+  /* ── 18-WEEK CALENDAR ── */
+  .calendar {
+    border: var(--rule);
+    margin-top: 48px;
+  }
+  .cal-header {
+    display: grid;
+    grid-template-columns: 72px 2fr 2fr 2fr;
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .cal-th {
+    padding: 14px 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border-right: 1px solid rgba(255,255,255,0.1);
+  }
+  .cal-th:last-child { border-right: none; }
+
+  .cal-unit-header {
+    grid-column: 1 / -1;
+    padding: 10px 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border-top: var(--rule);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .cal-unit-header.u1 { background: rgba(10,124,110,0.08); color: var(--teal); }
+  .cal-unit-header.u2 { background: rgba(227,100,20,0.08); color: var(--orange); }
+  .cal-unit-header.u3 { background: rgba(193,18,31,0.08); color: var(--red); }
+  .cal-unit-header.u4 { background: rgba(212,160,23,0.08); color: var(--gold); }
+  .cal-unit-header.u5 { background: rgba(10,124,110,0.08); color: var(--teal); }
+  .cal-unit-header.u6 { background: rgba(227,100,20,0.08); color: var(--orange); }
+  .cal-unit-header.u7 { background: rgba(193,18,31,0.08); color: var(--red); }
+  .cal-unit-header.u-mid { background: rgba(212,160,23,0.08); color: var(--gold); }
+  .cal-unit-header.u-final { background: var(--ink); color: var(--paper); }
+
+  .cal-row {
+    display: grid;
+    grid-template-columns: 72px 2fr 2fr 2fr;
+    border-top: 1px solid var(--cream);
+    transition: background 0.15s;
+  }
+  .cal-row:hover { background: rgba(0,0,0,0.02); }
+  .cal-wk {
+    padding: 18px 12px 18px 20px;
+    border-right: var(--rule);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 2px;
+  }
+  .wk-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .wk-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--dim);
+    opacity: 0.6;
+  }
+  .cal-cell {
+    padding: 18px 20px;
+    border-right: 1px solid var(--cream);
+    vertical-align: top;
+  }
+  .cal-cell:last-child { border-right: none; }
+  .cell-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+  .cell-body {
+    font-size: 12px;
+    line-height: 1.65;
+    color: var(--dim);
+  }
+  .badge {
+    display: inline-block;
+    margin-top: 7px;
+    padding: 2px 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 8.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-radius: 2px;
+  }
+  .badge-crit { background: rgba(193,18,31,0.1); color: var(--red); }
+  .badge-proj { background: rgba(10,124,110,0.1); color: var(--teal); }
+  .badge-found { background: rgba(212,160,23,0.1); color: var(--gold); }
+  .badge-exhibit { background: var(--ink); color: var(--paper); }
+
+  /* ── JEFF ANDERSON PRINCIPLES ── */
+  .jeff-banner {
+    background: var(--red);
+    color: white;
+    padding: 48px;
+    margin: 0 -48px;
+  }
+  .jeff-banner h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    letter-spacing: 0.1em;
+    margin-bottom: 28px;
+  }
+  .jeff-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+  }
+  .jeff-card {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 24px;
+    transition: background 0.2s;
+  }
+  .jeff-card:hover { background: rgba(255,255,255,0.18); }
+  .jeff-rule {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 8px;
+  }
+  .jeff-body {
+    font-size: 12.5px;
+    line-height: 1.75;
+    color: rgba(255,255,255,0.7);
+  }
+
+  /* ── ASSESSMENT / UNGRADING ── */
+  .ungrading {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: var(--rule);
+    margin-top: 48px;
+  }
+  .ungrade-left {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 48px;
+    border-right: var(--rule);
+  }
+  .ungrade-right {
+    padding: 48px;
+  }
+  .ungrade-left h3, .ungrade-right h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    margin-bottom: 20px;
+  }
+  .ungrade-left h3 { color: var(--gold); }
+  .ungrade-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .ungrade-list li {
+    font-size: 13.5px;
+    line-height: 1.65;
+    padding-left: 18px;
+    position: relative;
+  }
+  .ungrade-left .ungrade-list li { color: rgba(245,240,232,0.75); }
+  .ungrade-left .ungrade-list li::before { content: '→'; position: absolute; left: 0; color: var(--gold); font-family: 'IBM Plex Mono', monospace; font-size: 12px; }
+  .ungrade-right .ungrade-list li::before { content: '→'; position: absolute; left: 0; color: var(--teal); font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--dim); }
+  .ungrade-right .ungrade-list li { color: var(--dim); }
+
+  /* ── AMY KO RESEARCH CALLOUT ── */
+  .ako-box {
+    background: var(--teal);
+    color: white;
+    padding: 48px;
+    margin: 48px 0;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+  .ako-initial {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 120px;
+    line-height: 1;
+    opacity: 0.25;
+  }
+  .ako-content h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 12px;
+  }
+  .ako-content p {
+    font-size: 14px;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.7);
+    max-width: 600px;
+  }
+  .ako-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 20px;
+  }
+  .ako-chip {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+    padding: 5px 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 64px 48px;
+    border-top: 6px solid var(--red);
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 48px;
+    margin-bottom: 40px;
+  }
+  .footer-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    line-height: 0.95;
+    color: var(--paper);
+  }
+  .footer-title span { color: var(--red); }
+  .footer-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: rgba(245,240,232,0.4);
+    line-height: 1.8;
+    margin-top: 16px;
+  }
+  .footer-col h4 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+  .footer-col ul { list-style: none; }
+  .footer-col ul li {
+    font-size: 12.5px;
+    color: rgba(245,240,232,0.55);
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    line-height: 1.5;
+  }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: rgba(245,240,232,0.3);
+    letter-spacing: 0.1em;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .hero-left > * {
+    animation: fadeUp 0.7s ease forwards;
+    opacity: 0;
+  }
+  .hero-left > *:nth-child(1) { animation-delay: 0.1s; }
+  .hero-left > *:nth-child(2) { animation-delay: 0.25s; }
+  .hero-left > *:nth-child(3) { animation-delay: 0.4s; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-right { display: none; }
+    .masthead-main { grid-template-columns: 1fr; text-align: center; }
+    .masthead-left, .masthead-right { display: none; }
+    section { padding: 60px 24px; }
+    .container { padding: 0 24px; }
+    .phil-grid { grid-template-columns: 1fr; }
+    .tracks-wrap { grid-template-columns: 1fr; }
+    .track { border-right: none; }
+    .cal-header, .cal-row { grid-template-columns: 52px 1fr; }
+    .cal-cell:nth-child(3), .cal-cell:nth-child(4),
+    .cal-th:nth-child(3), .cal-th:nth-child(4) { display: none; }
+    .ungrading { grid-template-columns: 1fr; }
+    .ungrade-left { border-right: none; border-bottom: var(--rule); }
+    .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    .ako-box { grid-template-columns: 1fr; }
+    .ako-initial { display: none; }
+    .jeff-banner { margin: 0 -24px; }
+    .masthead-top, .masthead-main { padding: 12px 24px; }
+    .masthead-sub { padding: 14px 24px; }
+    .lineage { padding: 32px 24px; }
+  }
+
+  /* ═══ PROGRESS BAR ═══════════════════════════════════ */
+  .progress-strip {
+    position: sticky; top: 0; z-index: 1000;
+    background: var(--ink); padding: 10px 48px;
+    display: flex; align-items: center; gap: 16px;
+    border-bottom: 2px solid var(--red);
+  }
+  .progress-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    letter-spacing: .12em; text-transform: uppercase; color: rgba(245,240,232,.5);
+    white-space: nowrap; }
+  #progress-text { font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: rgba(245,240,232,.4); white-space: nowrap; }
+  .progress-track { flex: 1; height: 4px; background: rgba(255,255,255,.1); border-radius: 2px; }
+  #progress-fill { height: 100%; background: var(--teal); border-radius: 2px;
+    width: 0%; transition: width .4s ease; }
+  #active-track-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    color: var(--gold); letter-spacing: .1em; }
+
+  /* ═══ TRACK SELECTOR ═════════════════════════════════ */
+  .track-selector {
+    display: flex; gap: 0; border: var(--rule); margin-bottom: 40px; flex-wrap: wrap;
+  }
+  .track-btn {
+    flex: 1; padding: 14px 20px; background: transparent; border: none;
+    border-right: 1px solid var(--ink); cursor: pointer; font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--dim); transition: all .2s; min-width: 120px;
+  }
+  .track-btn:last-child { border-right: none; }
+  .track-btn:hover { background: var(--cream); color: var(--ink); }
+  .track-btn.active { background: var(--ink); color: var(--paper); }
+  .track-btn:focus-visible { outline: 2px solid var(--red); outline-offset: -2px; }
+
+  /* ═══ COMPLETE BUTTON ════════════════════════════════ */
+  .complete-btn {
+    margin-top: 14px; padding: 8px 16px; background: transparent;
+    border: 1px solid var(--cream); cursor: pointer; font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--dim);
+    transition: all .2s; display: block; width: 100%;
+  }
+  .complete-btn:hover { border-color: var(--teal); color: var(--teal); }
+  .complete-btn.completed { background: var(--teal); color: white; border-color: var(--teal); }
+  .complete-btn:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+
+  /* ═══ RECALL BOX ══════════════════════════════════════ */
+  .recall-btn {
+    margin-top: 10px; padding: 6px 12px; background: transparent;
+    border: 1px dashed var(--orange); cursor: pointer; font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--orange);
+    transition: all .2s;
+  }
+  .recall-btn:hover { background: rgba(227,100,20,.08); }
+  .recall-btn:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+  .recall-box {
+    margin-top: 12px; padding: 16px 18px;
+    background: rgba(227,100,20,.05); border-left: 3px solid var(--orange);
+    font-size: 12.5px;
+  }
+  .recall-box strong { font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--orange); display: block;
+    margin-bottom: 10px; }
+  .recall-box ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .recall-box li { padding-left: 14px; position: relative; line-height: 1.55; color: var(--dim); }
+  .recall-box li::before { content: '→'; position: absolute; left: 0; color: var(--orange);
+    font-family: 'IBM Plex Mono', monospace; }
+
+  /* ═══ HOW TO SUCCEED ══════════════════════════════════ */
+  .succeed-section {
+    background: var(--cream); border-top: var(--rule); border-bottom: var(--rule);
+    padding: 64px 48px;
+  }
+  .succeed-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0; border: var(--rule); margin-top: 32px;
+  }
+  .succeed-card {
+    padding: 28px; border-right: var(--rule); transition: background .2s;
+  }
+  .succeed-card:last-child { border-right: none; }
+  .succeed-card:hover { background: var(--paper); }
+  .succeed-num { font-family: 'Bebas Neue', sans-serif; font-size: 40px; line-height: 1;
+    color: var(--red); margin-bottom: 8px; }
+  .succeed-title { font-family: 'DM Serif Display', serif; font-size: 16px;
+    margin-bottom: 8px; font-style: italic; }
+  .succeed-body { font-size: 12.5px; line-height: 1.75; color: var(--dim); }
+
+  /* ═══ CONCEPT MAP ══════════════════════════════════════ */
+  .concept-map-section { padding: 64px 48px; border-top: var(--rule); }
+  .concept-flows {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px; margin-top: 32px;
+  }
+  .concept-flow {
+    border: 1px solid var(--cream); padding: 24px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    line-height: 1.9; color: var(--dim);
+  }
+  .concept-flow-label { font-size: 10px; letter-spacing: .15em; text-transform: uppercase;
+    color: var(--red); margin-bottom: 10px; }
+  .concept-flow .arrow { color: var(--orange); }
+
+  /* ═══ CAREER BOX ══════════════════════════════════════ */
+  .career-box {
+    margin-top: 14px; padding: 12px 14px;
+    background: rgba(10,124,110,.06); border-left: 3px solid var(--teal);
+    font-size: 12px;
+  }
+  .career-box strong { font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--teal); display: block;
+    margin-bottom: 6px; }
+  .career-box ul { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
+  .career-box li { padding: 2px 8px; background: rgba(10,124,110,.1); color: var(--teal);
+    font-size: 11px; }
+
+  /* ═══ BADGES ══════════════════════════════════════════ */
+  .badges-section { padding: 64px 48px; background: var(--ink); color: var(--paper);
+    border-top: var(--rule); }
+  .badges-section h2 { font-family: 'Bebas Neue', sans-serif; font-size: 42px;
+    letter-spacing: .05em; color: var(--paper); margin-bottom: 8px; }
+  .badges-section .lead { color: rgba(245,240,232,.5); margin-bottom: 32px; }
+  .badge-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+    border: 1px solid rgba(255,255,255,.1); }
+  .badge-item {
+    padding: 32px; border-right: 1px solid rgba(255,255,255,.1);
+    transition: background .2s; position: relative; overflow: hidden;
+  }
+  .badge-item:last-child { border-right: none; }
+  .badge-item:hover { background: rgba(255,255,255,.05); }
+  .badge-icon { font-size: 36px; margin-bottom: 12px; display: block; }
+  .badge-name { font-family: 'DM Serif Display', serif; font-size: 20px; font-style: italic;
+    margin-bottom: 6px; }
+  .badge-status { font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    letter-spacing: .1em; text-transform: uppercase; color: rgba(245,240,232,.35); }
+  .badge-item.badge-earned .badge-status { color: var(--gold); }
+  .badge-item.badge-earned::after { content: '✓'; position: absolute; right: 20px; top: 20px;
+    font-size: 24px; color: var(--gold); }
+  .badge-item.badge-earned { border-color: rgba(212,160,23,.3); }
+
+  /* ═══ DATASETS ════════════════════════════════════════ */
+  .datasets-section { padding: 64px 48px; border-top: var(--rule); background: var(--cream); }
+  .dataset-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 0; border: var(--rule); margin-top: 32px; }
+  .dataset-item { padding: 24px; border-right: var(--rule); transition: background .2s; }
+  .dataset-item:last-child { border-right: none; }
+  .dataset-item:hover { background: var(--paper); }
+  .dataset-name { font-family: 'DM Serif Display', serif; font-size: 16px;
+    font-style: italic; margin-bottom: 5px; }
+  .dataset-desc { font-size: 12px; color: var(--dim); line-height: 1.6; margin-bottom: 12px; }
+  .dataset-link { font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--red);
+    text-decoration: none; border-bottom: 1px solid var(--red); }
+  .dataset-link:hover { color: var(--orange); border-color: var(--orange); }
+
+  @media (max-width: 900px) {
+    .progress-strip { padding: 10px 24px; }
+    .succeed-grid, .badge-grid, .dataset-grid { grid-template-columns: 1fr; }
+    .succeed-card, .badge-item, .dataset-item { border-right: none; border-bottom: var(--rule); }
+    .succeed-card:last-child, .badge-item:last-child, .dataset-item:last-child { border-bottom: none; }
+    .track-selector { flex-direction: column; }
+    .track-btn { border-right: none; border-bottom: 1px solid var(--ink); }
+    .succeed-section, .concept-map-section, .badges-section, .datasets-section { padding: 40px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- PROGRESS BAR + TRACK INDICATOR -->
+<div class="progress-strip" role="status" aria-label="Course progress">
+  <span class="progress-label">Progress</span>
+  <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+    <div id="progress-fill"></div>
+  </div>
+  <span id="progress-text">0 of 9 units completed</span>
+  <span style="color:rgba(245,240,232,.2);margin:0 8px">|</span>
+  <span class="progress-label">Track:</span>
+  <span id="active-track-label">All Tracks</span>
+</div>
+
+<!-- MASTHEAD -->
+<header class="masthead">
+  <div class="masthead-top">
+    <span>Foothill · West Valley College</span>
+    <span>Computer Science Department</span>
+    <span>CS 180 · 3 Units · 18 Weeks</span>
+  </div>
+  <div class="masthead-main">
+    <div class="masthead-left">
+      Tracks: Novice Explorer<br>
+      The Builder · The Architect<br>
+      All paths welcome
+    </div>
+    <div class="masthead-title">
+      Intro to<br><span>Artificial</span><br>Intelligence
+    </div>
+    <div class="masthead-right">
+      Project-Based Learning<br>
+      Liberatory Education<br>
+      Ungrading · Portfolio
+    </div>
+  </div>
+  <div class="masthead-sub">
+    AI is not magic — it is math, history, and human choice. We build from the root and ask: who does this serve?
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">Course Philosophy</div>
+    <h1 class="hero-headline">
+      The machine doesn't think.<br>
+      <em>You teach it to.</em><br>
+      Now you must decide what.
+    </h1>
+    <p class="hero-deck">
+      AI isn't magic — it's math, history, and human choice wrapped in an abstraction. We dismantle the abstraction layer by layer, learning from the root. We choose our own adventure, build things that matter to our communities, and ask the questions that textbooks skip.
+    </p>
+  </div>
+  <div class="hero-right">
+    <!-- Animated Neural Network -->
+    <svg id="neural-canvas" viewBox="0 0 380 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Layer labels -->
+      <text x="30" y="22" class="node-label" text-anchor="middle">INPUT</text>
+      <text x="145" y="22" class="node-label" text-anchor="middle">HIDDEN 1</text>
+      <text x="240" y="22" class="node-label" text-anchor="middle">HIDDEN 2</text>
+      <text x="345" y="22" class="node-label" text-anchor="middle">OUTPUT</text>
+
+      <!-- All edges (background) -->
+      <line x1="45" y1="70" x2="130" y2="80" class="edge"/>
+      <line x1="45" y1="70" x2="130" y2="120" class="edge"/>
+      <line x1="45" y1="70" x2="130" y2="160" class="edge"/>
+      <line x1="45" y1="70" x2="130" y2="200" class="edge"/>
+      <line x1="45" y1="120" x2="130" y2="80" class="edge"/>
+      <line x1="45" y1="120" x2="130" y2="120" class="edge"/>
+      <line x1="45" y1="120" x2="130" y2="160" class="edge"/>
+      <line x1="45" y1="120" x2="130" y2="200" class="edge"/>
+      <line x1="45" y1="170" x2="130" y2="80" class="edge"/>
+      <line x1="45" y1="170" x2="130" y2="120" class="edge"/>
+      <line x1="45" y1="170" x2="130" y2="160" class="edge"/>
+      <line x1="45" y1="170" x2="130" y2="200" class="edge"/>
+      <line x1="45" y1="220" x2="130" y2="80" class="edge"/>
+      <line x1="45" y1="220" x2="130" y2="120" class="edge"/>
+      <line x1="45" y1="220" x2="130" y2="160" class="edge"/>
+      <line x1="45" y1="220" x2="130" y2="200" class="edge"/>
+      <line x1="45" y1="270" x2="130" y2="80" class="edge"/>
+      <line x1="45" y1="270" x2="130" y2="120" class="edge"/>
+      <line x1="45" y1="270" x2="130" y2="160" class="edge"/>
+      <line x1="45" y1="270" x2="130" y2="200" class="edge"/>
+
+      <line x1="145" y1="80" x2="225" y2="100" class="edge"/>
+      <line x1="145" y1="80" x2="225" y2="160" class="edge"/>
+      <line x1="145" y1="80" x2="225" y2="220" class="edge"/>
+      <line x1="145" y1="120" x2="225" y2="100" class="edge"/>
+      <line x1="145" y1="120" x2="225" y2="160" class="edge"/>
+      <line x1="145" y1="120" x2="225" y2="220" class="edge"/>
+      <line x1="145" y1="160" x2="225" y2="100" class="edge"/>
+      <line x1="145" y1="160" x2="225" y2="160" class="edge"/>
+      <line x1="145" y1="160" x2="225" y2="220" class="edge"/>
+      <line x1="145" y1="200" x2="225" y2="100" class="edge"/>
+      <line x1="145" y1="200" x2="225" y2="160" class="edge"/>
+      <line x1="145" y1="200" x2="225" y2="220" class="edge"/>
+
+      <line x1="240" y1="100" x2="330" y2="130" class="edge"/>
+      <line x1="240" y1="100" x2="330" y2="200" class="edge"/>
+      <line x1="240" y1="160" x2="330" y2="130" class="edge"/>
+      <line x1="240" y1="160" x2="330" y2="200" class="edge"/>
+      <line x1="240" y1="220" x2="330" y2="130" class="edge"/>
+      <line x1="240" y1="220" x2="330" y2="200" class="edge"/>
+
+      <!-- Animated active edges -->
+      <line x1="45" y1="120" x2="130" y2="160" class="edge-active" style="animation-delay:0s"/>
+      <line x1="45" y1="220" x2="130" y2="120" class="edge-active" style="animation-delay:0.4s"/>
+      <line x1="145" y1="160" x2="225" y2="160" class="edge-active" style="animation-delay:0.8s"/>
+      <line x1="145" y1="120" x2="225" y2="100" class="edge-active" style="animation-delay:1.2s"/>
+      <line x1="240" y1="160" x2="330" y2="130" class="edge-active" style="animation-delay:1.6s"/>
+      <line x1="240" y1="100" x2="330" y2="200" class="edge-active" style="animation-delay:2.0s"/>
+
+      <!-- Input nodes -->
+      <circle cx="45" cy="70" r="9" class="node"/>
+      <circle cx="45" cy="120" r="9" class="node node-active" style="animation-delay:0.1s"/>
+      <circle cx="45" cy="170" r="9" class="node"/>
+      <circle cx="45" cy="220" r="9" class="node node-active" style="animation-delay:0.6s"/>
+      <circle cx="45" cy="270" r="9" class="node"/>
+
+      <!-- Hidden 1 nodes -->
+      <circle cx="145" cy="80" r="9" class="node"/>
+      <circle cx="145" cy="120" r="9" class="node node-active" style="animation-delay:0.4s"/>
+      <circle cx="145" cy="160" r="9" class="node node-active" style="animation-delay:0.9s"/>
+      <circle cx="145" cy="200" r="9" class="node"/>
+
+      <!-- Hidden 2 nodes -->
+      <circle cx="240" cy="100" r="9" class="node node-active" style="animation-delay:1.3s"/>
+      <circle cx="240" cy="160" r="9" class="node node-active" style="animation-delay:0.7s"/>
+      <circle cx="240" cy="220" r="9" class="node"/>
+
+      <!-- Output nodes -->
+      <circle cx="345" cy="130" r="12" class="node node-active" style="animation-delay:1.8s"/>
+      <circle cx="345" cy="200" r="12" class="node"/>
+
+      <!-- Input labels -->
+      <text x="8" y="74" class="node-label">x₁</text>
+      <text x="8" y="124" class="node-label">x₂</text>
+      <text x="8" y="174" class="node-label">x₃</text>
+      <text x="8" y="224" class="node-label">x₄</text>
+      <text x="8" y="274" class="node-label">x₅</text>
+
+      <!-- Output labels -->
+      <text x="362" y="134" class="node-label">ŷ₁</text>
+      <text x="362" y="204" class="node-label">ŷ₂</text>
+
+      <!-- Weight formula -->
+      <text x="145" y="292" class="node-label" text-anchor="middle" style="font-size:10px;fill:#5a5a5a;">ŷ = σ(Wx + b)</text>
+    </svg>
+
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-number">18</div>
+        <div class="stat-label">Weeks of<br>Deep Learning</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">3</div>
+        <div class="stat-label">Adventure<br>Tracks</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">0</div>
+        <div class="stat-label">Exams.<br>All Projects.</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">∞</div>
+        <div class="stat-label">Questions<br>Encouraged</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PHILOSOPHY -->
+<hr class="section-rule">
+<section>
+  <div class="section-tag">Our Foundation</div>
+  <h2>Why This Course <em>Exists</em></h2>
+  <p class="lead">
+    Most AI courses teach you to use tools. This one teaches you to think — about systems, power, and whose intelligence gets valued. We start at the root: probability, logic, linear algebra. We build upward. We ask critical questions at every layer.
+  </p>
+
+  <div class="phil-grid">
+    <div class="phil-card">
+      <div class="phil-num">01</div>
+      <div class="phil-title">First Principles First</div>
+      <p class="phil-body">We don't start with TensorFlow. We start with a probability, a line, a decision. You'll understand every layer before you stack them. Amy Ko's research shows that reading before writing — understanding before doing — creates more robust, transferable learning.</p>
+    </div>
+    <div class="phil-card">
+      <div class="phil-num">02</div>
+      <div class="phil-title">Choose Your Adventure</div>
+      <p class="phil-body">Three tracks share core concepts and diverge on projects. You pick problems that matter to your community. Jeff Anderson's framework: "You are the world's leading expert on your own learning." Your final project is yours to define.</p>
+    </div>
+    <div class="phil-card">
+      <div class="phil-num">03</div>
+      <div class="phil-title">Liberation Through Understanding</div>
+      <p class="phil-body">Rooted in Paulo Freire and bell hooks: you are not an empty vessel to be filled with AI facts. You are a co-creator of knowledge. Critical consciousness about who built AI systems — and who they harm — is not a "soft" topic. It is the most advanced technical skill in this course.</p>
+    </div>
+  </div>
+</section>
+
+<!-- AMY KO CALLOUT -->
+<div class="ako-box container" style="max-width:1280px;">
+  <div class="ako-initial">AK</div>
+  <div class="ako-content">
+    <h3>Rooted in Dr. Amy J. Ko's Research</h3>
+    <p>
+      Dr. Ko at the University of Washington has spent 25+ years researching how to make computing education equitable, joyous, and liberatory. Her discoveries directly shape this course: justice-focused CS requires student trust and agency; understanding ML requires understanding uncertainty; reading programs before writing them builds deeper mastery; scaffolded problem solving beats unguided trial-and-error. CS assessments often aren't fair — so we ditch traditional assessments entirely.
+    </p>
+    <div class="ako-chips">
+      <span class="ako-chip">Equitable Computing Ed</span>
+      <span class="ako-chip">Read Before Write</span>
+      <span class="ako-chip">Scaffolded Problem Solving</span>
+      <span class="ako-chip">Justice-Focused CS</span>
+      <span class="ako-chip">Understanding Uncertainty in ML</span>
+      <span class="ako-chip">Student Agency + Trust</span>
+    </div>
+  </div>
+</div>
+
+<!-- JEFF ANDERSON PRINCIPLES -->
+<hr class="section-rule">
+<section>
+  <div class="jeff-banner">
+    <h3>Jeff Anderson's Principles — Applied to CS 180</h3>
+    <div class="jeff-grid">
+      <div class="jeff-card">
+        <div class="jeff-rule">Rule 1: Health Comes First</div>
+        <div class="jeff-body">Your physical, mental, and emotional health always comes before course content. If you must choose between wellbeing and a deadline, choose wellbeing. Come back when you're ready. This is not a platitude — it is the first rule.</div>
+      </div>
+      <div class="jeff-card">
+        <div class="jeff-rule">Rule 2: Deep Learning > Shallow</div>
+        <div class="jeff-body">We don't optimize for grades. We optimize for understanding. A neural net you truly understand is worth infinitely more than one you copied. Find your sweet spot: the edge of productive struggle.</div>
+      </div>
+      <div class="jeff-card">
+        <div class="jeff-rule">Rule 3: Show Up, Show Out</div>
+        <div class="jeff-body">Your presence enriches everyone. Peer instruction is the most powerful learning tool we have — Amy Ko's research confirms this. When you teach, you learn deepest. Bring your full self.</div>
+      </div>
+      <div class="jeff-card">
+        <div class="jeff-rule">Rule 4: Finish Vegetables First</div>
+        <div class="jeff-body">Complete the core learning before passion projects. Vegetables = foundational AI concepts. Dessert = building something you care about. Both required. The best final projects come from students who did both.</div>
+      </div>
+      <div class="jeff-card">
+        <div class="jeff-rule">Rule 5: Critical Consciousness = Technical Skill</div>
+        <div class="jeff-body">Understanding who built a system, for whom, and what it encodes is not soft — it's the most advanced skill here. You have agency in this room. Use it.</div>
+      </div>
+      <div class="jeff-card">
+        <div class="jeff-rule">The 2-Min Question Rule</div>
+        <div class="jeff-body">When stuck, give yourself 2 minutes. Then write a precise question: not "I don't get it" but "I'm on step 4 of backprop and I understand the chain rule but can't see why we multiply the Jacobian here." That specificity is expertise in formation.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LINEAGE -->
+<div class="lineage">
+  <h3>Intellectual Lineage</h3>
+  <div class="lineage-grid">
+    <div class="lineage-item">
+      <div class="lineage-name">Alan Turing</div>
+      <div class="lineage-desc">On computable numbers. The Turing Test. What does it mean for a machine to think?</div>
+    </div>
+    <div class="lineage-item">
+      <div class="lineage-name">Claude Shannon</div>
+      <div class="lineage-desc">Information theory. Entropy. The mathematical foundation of all communication.</div>
+    </div>
+    <div class="lineage-item">
+      <div class="lineage-name">Paulo Freire</div>
+      <div class="lineage-desc">Pedagogy of the Oppressed. Students are not empty vessels. Knowledge is liberation.</div>
+    </div>
+    <div class="lineage-item">
+      <div class="lineage-name">bell hooks</div>
+      <div class="lineage-desc">Teaching to Transgress. The classroom as a site of freedom and transformation.</div>
+    </div>
+    <div class="lineage-item">
+      <div class="lineage-name">Joy Buolamwini</div>
+      <div class="lineage-desc">Gender Shades. Bias in facial recognition. The coded gaze and its consequences.</div>
+    </div>
+    <div class="lineage-item">
+      <div class="lineage-name">Safiya Umoja Noble</div>
+      <div class="lineage-desc">Algorithms of Oppression. Search engines and the politics of information retrieval.</div>
+    </div>
+    <div class="lineage-item">
+      <div class="lineage-name">Ruha Benjamin</div>
+      <div class="lineage-desc">Race After Technology. How "neutral" automation encodes and amplifies racial hierarchy.</div>
+    </div>
+    <div class="lineage-item">
+      <div class="lineage-name">Amy J. Ko</div>
+      <div class="lineage-desc">Equitable, joyous, liberatory learning about computing for all. The north star.</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- TRACK SELECTOR -->
+<div class="container" style="max-width:1280px;padding-top:0;padding-bottom:0;">
+  <div class="track-selector" role="group" aria-label="Choose your learning track">
+    <button class="track-btn active" data-track="all" onclick="setTrack('all')"
+      aria-pressed="true" aria-label="Show all tracks">
+      ☰ All Tracks
+    </button>
+    <button class="track-btn" data-track="n" onclick="setTrack('n')"
+      aria-pressed="false" aria-label="Novice Explorer track">
+      🌱 Novice Explorer
+    </button>
+    <button class="track-btn" data-track="b" onclick="setTrack('b')"
+      aria-pressed="false" aria-label="Builder track">
+      🔨 The Builder
+    </button>
+    <button class="track-btn" data-track="a" onclick="setTrack('a')"
+      aria-pressed="false" aria-label="Architect track">
+      🔬 The Architect
+    </button>
+  </div>
+</div>
+
+<!-- TRACKS -->
+<hr class="section-rule">
+<section id="tracks">
+  <div class="section-tag">Choose Your Path</div>
+  <h2>Three Tracks.<br><em>One Destination.</em></h2>
+  <p class="lead">
+    Every student engages the same core concepts each week — probability, optimization, learning, ethics. Then we diverge into project tracks. Tracks aren't ceilings. They're starting points. You can move up mid-semester. You can also propose your own track.
+  </p>
+
+  <div class="tracks-wrap">
+    <div class="track novice">
+      <div class="track-header">
+        <div class="track-label">Track I</div>
+        <div class="track-name">The Curious Explorer</div>
+        <div class="track-tagline">"No CS background required. Just bring your questions."</div>
+        <div class="track-accent">I</div>
+      </div>
+      <div class="track-body">
+        <p>You'll use visual tools, Google Colab notebooks, and real community data to understand AI from the outside in. We learn to <em>read</em> AI systems before we write them — a principle from Amy Ko's research: reading before writing creates deeper mastery.</p>
+        <ul class="project-list">
+          <li><span class="proj-icon">📋</span><span>Wk 1–2: AI Audit — analyze a real AI system that affects your community. Document what it does, who it serves, and what it misses.</span></li>
+          <li><span class="proj-icon">📊</span><span>Wk 3–5: Spam Detector using Naive Bayes in pure Python dicts — no libraries. Every probability hand-calculated.</span></li>
+          <li><span class="proj-icon">🖼️</span><span>Wk 6–9: Image Classifier using Teachable Machine, trained on photos meaningful to you. Document every failure.</span></li>
+          <li><span class="proj-icon">💬</span><span>Wk 10–13: Chatbot: rule-based first, then ML-powered. You compare the two and write about what the difference reveals.</span></li>
+          <li><span class="proj-icon">📰</span><span>Wk 14–16: Fake News Detector + a bias audit of your own model.</span></li>
+        </ul>
+        <div class="final-project">
+          🎯 Final: "AI That Serves My Community" — a working prototype + a public presentation + a written community impact analysis.
+        </div>
+      </div>
+    </div>
+
+    <div class="track builder">
+      <div class="track-header">
+        <div class="track-label">Track II</div>
+        <div class="track-name">The Builder</div>
+        <div class="track-tagline">"You know Python. Now let's make it think."</div>
+        <div class="track-accent">II</div>
+      </div>
+      <div class="track-body">
+        <p>You implement core algorithms from scratch in NumPy before ever touching scikit-learn. The rule: never use a library function until you've built it yourself first. Understanding means being able to explain every matrix multiplication.</p>
+        <ul class="project-list">
+          <li><span class="proj-icon">🔢</span><span>Wk 1–2: Naive Bayes from scratch with Python + NumPy only. Prove it works on real data.</span></li>
+          <li><span class="proj-icon">📈</span><span>Wk 3–5: Linear Regression with gradient descent — no sklearn. Every update rule derived from the loss.</span></li>
+          <li><span class="proj-icon">🧠</span><span>Wk 6–9: 3-layer neural network with backpropagation in NumPy. MNIST from scratch.</span></li>
+          <li><span class="proj-icon">🔍</span><span>Wk 10–12: A* search + minimax for a game you design yourself.</span></li>
+          <li><span class="proj-icon">💬</span><span>Wk 13–15: NLP pipeline: tokenize → TF-IDF → classify → evaluate for bias.</span></li>
+        </ul>
+        <div class="final-project">
+          🎯 Final: Full ML pipeline applied to a social justice dataset of your choosing. Technical rigor + critical analysis of what the model encodes.
+        </div>
+      </div>
+    </div>
+
+    <div class="track architect">
+      <div class="track-header">
+        <div class="track-label">Track III</div>
+        <div class="track-name">The Architect</div>
+        <div class="track-tagline">"You want the derivations. All of them."</div>
+        <div class="track-accent">III</div>
+      </div>
+      <div class="track-body">
+        <p>Calculus, linear algebra, probability theory — all in play. You'll derive backpropagation from the chain rule, understand attention mechanisms mathematically, and engage critically with published AI research papers. Amy Ko: "understanding ML requires understanding uncertainty."</p>
+        <ul class="project-list">
+          <li><span class="proj-icon">∂</span><span>Wk 1–2: Derive the MLE estimator for Gaussian distributions from scratch.</span></li>
+          <li><span class="proj-icon">📐</span><span>Wk 3–5: Prove gradient descent convergence under convexity conditions.</span></li>
+          <li><span class="proj-icon">🔁</span><span>Wk 6–9: Derive backprop via chain rule; implement a mini autograd engine.</span></li>
+          <li><span class="proj-icon">👁️</span><span>Wk 10–12: Implement a mini-transformer with self-attention from scratch.</span></li>
+          <li><span class="proj-icon">🛡️</span><span>Wk 13–15: Adversarial ML — FGSM attack, certified defenses, robustness analysis.</span></li>
+        </ul>
+        <div class="final-project">
+          🎯 Final: A novel research question + replication study of a published paper. Submit as a research preprint with critical analysis of its claims.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 18-WEEK CALENDAR -->
+<hr class="section-rule">
+<section id="calendar">
+  <div class="section-tag">18-Week Calendar</div>
+  <h2>Root to Branch:<br><em>Week by Week</em></h2>
+  <p class="lead">
+    We begin with the question of intelligence itself — historical, philosophical, critical — before touching a line of code. This is Amy Ko's principle of reading before writing, and Freire's principle that consciousness precedes action. Every unit builds deliberately on the last.
+  </p>
+
+  <div class="calendar">
+    <div class="cal-header">
+      <div class="cal-th">Wk</div>
+      <div class="cal-th">Theme & Core Question</div>
+      <div class="cal-th">Concepts — From the Root</div>
+      <div class="cal-th">Lab / Project Work</div>
+    </div>
+
+    <!-- UNIT 1 -->
+    <div class="cal-row" style="background:rgba(10,124,110,0.04);">
+      <div class="cal-wk" style="background:rgba(10,124,110,0.06);"><span class="wk-tag">Unit 1</span></div>
+      <div class="cal-cell" colspan="3" style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--teal);padding:10px 20px;grid-column:2/-1;">
+        What is Intelligence? — Epistemology, History, Probability
+      </div>
+    </div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-num">01</span><span class="wk-tag">Unit 1</span></div>
+      <div class="cal-cell">
+        <div class="cell-title">What Is Intelligence?</div>
+        <div class="cell-body">Turing Test, Chinese Room, animal cognition. Who decides what counts as intelligent? History from Dartmouth 1956 to ChatGPT 2024.</div>
+        <span class="badge badge-found">Foundational</span>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Symbolic AI vs. Connectionism</div>
+        <div class="cell-body">Two paradigm wars. Expert systems. The perceptron winter. Why neural nets came back. Critical framing: Freire's banking model of education mirrors rule-based AI.</div>
+        <span class="badge badge-crit">Critical</span>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Lab: Design Your Turing Test</div>
+        <div class="cell-body">Students design, administer, and analyze a Turing test on a real LLM. 300-word reflection: what did it reveal and what did it conceal?</div>
+        <span class="badge badge-proj">Project</span>
+        <button class="complete-btn" data-complete="wk1" onclick="toggleComplete('wk1')" aria-pressed="false">Mark Complete</button>
+        <button class="recall-btn" data-recall="wk1" onclick="toggleRecall('wk1')" aria-expanded="false">🧠 Quick Recall</button>
+        <div class="recall-box" id="recall-wk1" aria-hidden="true">
+          <strong>🧠 Quick Recall</strong>
+          <ul>
+            <li>What would it mean for a machine to "truly" think?</li>
+            <li>Name one thing the Turing Test cannot measure.</li>
+            <li>What does "intelligence" assume about the judge?</li>
+          </ul>
+        </div>
+        <div class="career-box">
+          <strong>💼 Careers that need this</strong>
+          <ul><li>AI Product Manager</li><li>ML Ethics Researcher</li><li>Policy Analyst</li></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-num">02</span><span class="wk-tag">Unit 1</span></div>
+      <div class="cal-cell">
+        <div class="cell-title">The Grammar of AI: Probability</div>
+        <div class="cell-body">Random variables, events, joint probability. Bayes' theorem from scratch. Why does probability let us reason under uncertainty?</div>
+        <span class="badge badge-found">Foundational</span>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Intuition vs. Formula</div>
+        <div class="cell-body">Monty Hall, base rate fallacy, Bayesian reasoning in medicine. Humans are bad Bayesians. Ko: "understanding ML means understanding uncertainty." Novice: visual tools. Architect: measure theory intro.</div>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Lab: Spam Classifier by Hand</div>
+        <div class="cell-body">Build Naive Bayes with Python dicts only — zero libraries. Every probability manually computed. No moving forward until you can explain every number.</div>
+        <span class="badge badge-proj">Project</span>
+        <button class="complete-btn" data-complete="wk2" onclick="toggleComplete('wk2')" aria-pressed="false">Mark Complete</button>
+        <button class="recall-btn" data-recall="wk2" onclick="toggleRecall('wk2')" aria-expanded="false">🧠 Quick Recall</button>
+        <div class="recall-box" id="recall-wk2" aria-hidden="true">
+          <strong>🧠 Quick Recall</strong>
+          <ul>
+            <li>Write Bayes theorem from memory. What does each term mean?</li>
+            <li>Why do we use log probabilities in Naive Bayes?</li>
+            <li>What does the "naive" assumption mean — and when does it fail?</li>
+          </ul>
+        </div>
+        <div class="career-box">
+          <strong>💼 Careers that need this</strong>
+          <ul><li>Data Scientist</li><li>Security Engineer</li><li>NLP Engineer</li></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- UNIT 2 -->
+    <div class="cal-row">
+      <div class="cal-wk" style="background:rgba(227,100,20,0.06);"><span class="wk-tag">Unit 2</span></div>
+      <div class="cal-cell" colspan="3" style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--orange);padding:10px 20px;grid-column:2/-1;">
+        AI as Search — State Space, Heuristics, Adversarial Play
+      </div>
+    </div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-num">03</span><span class="wk-tag">Unit 2</span></div>
+      <div class="cal-cell">
+        <div class="cell-title">AI as Search</div>
+        <div class="cell-body">BFS, DFS, A*. The state space. How is intelligence framed as finding a path through a space of possibilities? The frame problem introduced.</div>
+        <span class="badge badge-found">Foundational</span>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Heuristics: Art or Science?</div>
+        <div class="cell-body">Admissibility, consistency, completeness. Novice: interactive visual grid. Builder: implement all three. Architect: prove admissibility guarantee from scratch.</div>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Lab: Maze Solver</div>
+        <div class="cell-body">Build, visualize, and compare BFS vs. A*. Then ask: what does "optimal" actually mean in a real-world search problem?</div>
+        <span class="badge badge-proj">Project</span>
+        <button class="complete-btn" data-complete="wk3" onclick="toggleComplete('wk3')" aria-pressed="false">Mark Complete</button>
+        <button class="recall-btn" data-recall="wk3" onclick="toggleRecall('wk3')" aria-expanded="false">🧠 Quick Recall</button>
+        <div class="recall-box" id="recall-wk3" aria-hidden="true">
+          <strong>🧠 Quick Recall</strong>
+          <ul>
+            <li>What does A* guarantee that BFS doesn't? When?</li>
+            <li>What makes a heuristic "admissible"?</li>
+            <li>Name a real problem where BFS is the right choice over A*.</li>
+          </ul>
+        </div>
+        <div class="career-box">
+          <strong>💼 Careers that need this</strong>
+          <ul><li>Robotics Engineer</li><li>Game Developer</li><li>Logistics/Routing</li></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-num">04</span><span class="wk-tag">Unit 2</span></div>
+      <div class="cal-cell">
+        <div class="cell-title">Games & Adversarial AI</div>
+        <div class="cell-body">Minimax, alpha-beta pruning. What assumptions does "optimal play" make about your opponent — and about the world?</div>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Game Theory + Ethics</div>
+        <div class="cell-body">Zero-sum vs. cooperative games. Prisoner's dilemma. Arms races. When AI agents compete, who gets hurt? Critical discussion: autonomous weapons, recommendation algorithms.</div>
+        <span class="badge badge-crit">Critical</span>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Project: Unbeatable Tic-Tac-Toe</div>
+        <div class="cell-body">Minimax from scratch. Novice: scaffolded. Builder: with alpha-beta. Architect: prove the speedup with a time-complexity analysis.</div>
+        <span class="badge badge-proj">Project</span>
+        <button class="complete-btn" data-complete="wk4" onclick="toggleComplete('wk4')" aria-pressed="false">Mark Complete</button>
+        <button class="recall-btn" data-recall="wk4" onclick="toggleRecall('wk4')" aria-expanded="false">🧠 Quick Recall</button>
+        <div class="recall-box" id="recall-wk4" aria-hidden="true">
+          <strong>🧠 Quick Recall</strong>
+          <ul>
+            <li>What does alpha-beta pruning guarantee about the result vs. minimax?</li>
+            <li>What assumption does minimax make about your opponent?</li>
+            <li>Name a real domain where minimax would fail — and why.</li>
+          </ul>
+        </div>
+        <div class="career-box">
+          <strong>💼 Careers that need this</strong>
+          <ul><li>Game AI Developer</li><li>Decision Systems Engineer</li><li>Computational Economist</li></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- UNIT 3 -->
+    <div class="cal-row">
+      <div class="cal-wk" style="background:rgba(193,18,31,0.06);"><span class="wk-tag">Unit 3</span></div>
+      <div class="cal-cell" colspan="3" style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--red);padding:10px 20px;grid-column:2/-1;">
+        Machine Learning — Loss, Gradient Descent, Classification
+      </div>
+    </div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-num">05</span><span class="wk-tag">Unit 3</span></div>
+      <div class="cal-cell">
+        <div class="cell-title">What Does It Mean to Learn?</div>
+        <div class="cell-body">Loss functions, gradient descent, linear regression. This is the root of all neural networks. Everything builds here. Do not skip this week.</div>
+        <span class="badge badge-found">Foundational</span>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Cost Minimization Intuition</div>
+        <div class="cell-body">MSE loss, partial derivatives, learning rate. Novice: interactive gradient visualization. Builder: NumPy implementation. Architect: prove convergence under strong convexity.</div>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Lab: Rent Predictor</div>
+        <div class="cell-body">Predict housing prices in your own neighborhood. Then: whose neighborhoods get valued more, and what does the model encode about society?</div>
+        <span class="badge badge-crit">Critical</span>
+        <button class="complete-btn" data-complete="wk5" onclick="toggleComplete('wk5')" aria-pressed="false">Mark Complete</button>
+        <button class="recall-btn" data-recall="wk5" onclick="toggleRecall('wk5')" aria-expanded="false">🧠 Quick Recall</button>
+        <div class="recall-box" id="recall-wk5" aria-hidden="true">
+          <strong>🧠 Quick Recall</strong>
+          <ul>
+            <li>Write the MSE loss function. What does each term mean?</li>
+            <li>Why does the learning rate matter? What happens if it's too high?</li>
+            <li>What is the difference between the loss and the gradient?</li>
+          </ul>
+        </div>
+        <div class="career-box">
+          <strong>💼 Careers that need this</strong>
+          <ul><li>ML Engineer</li><li>Quantitative Analyst</li><li>Data Scientist</li></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-num">06</span><span class="wk-tag">Unit 3</span></div>
+      <div class="cal-cell">
+        <div class="cell-title">Classification + Decision Boundaries</div>
+        <div class="cell-body">Logistic regression, sigmoid activation, binary cross-entropy loss. From predicting "how much" to deciding "which category."</div>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">What Does "Accurate" Mean?</div>
+        <div class="cell-body">Precision, recall, F1, confusion matrix. Accuracy is a lie when classes are imbalanced. Medical diagnosis, recidivism prediction, hiring algorithms. What should we optimize for?</div>
+        <span class="badge badge-crit">Critical</span>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Project: Admissions Classifier</div>
+        <div class="cell-body">Build a college admission classifier. Then audit it for bias. Write a 400-word ethics brief: what does this model assume, and who does it harm?</div>
+        <span class="badge badge-proj">Project</span>
+        <button class="complete-btn" data-complete="wk6" onclick="toggleComplete('wk6')" aria-pressed="false">Mark Complete</button>
+        <button class="recall-btn" data-recall="wk6" onclick="toggleRecall('wk6')" aria-expanded="false">🧠 Quick Recall</button>
+        <div class="recall-box" id="recall-wk6" aria-hidden="true">
+          <strong>🧠 Quick Recall</strong>
+          <ul>
+            <li>What is the difference between precision and recall?</li>
+            <li>When would you choose high recall over high precision?</li>
+            <li>How can a model be 95% accurate and still deeply harmful?</li>
+          </ul>
+        </div>
+        <div class="career-box">
+          <strong>💼 Careers that need this</strong>
+          <ul><li>AI Fairness Researcher</li><li>Classification Engineer</li><li>Responsible AI Lead</li></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- UNIT 4 -->
+    <div class="cal-row">
+      <div class="cal-wk" style="background:rgba(212,160,23,0.06);"><span class="wk-tag">Unit 4</span></div>
+      <div class="cal-cell" colspan="3" style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);padding:10px 20px;grid-column:2/-1;">
+        Neural Networks — Perceptron to Backpropagation
+      </div>
+    </div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-num">07</span><span class="wk-tag">Unit 4</span></div>
+      <div class="cal-cell">
+        <div class="cell-title">The Neuron: Biology to Math</div>
+        <div class="cell-body">The biological neuron → the perceptron. Weights, bias, activation functions. The XOR problem: why one layer can't learn everything.</div>
+        <span class="badge badge-found">Foundational</span>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Multi-Layer Networks</div>
+        <div class="cell-body">Hidden layers, ReLU, tanh. Universal approximation theorem (intuitively). Novice: trace the network on paper. Architect: prove the UAT sketch.</div>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Lab: XOR Neural Net</div>
+        <div class="cell-body">NumPy only. Trace every weight update by hand at least once. You must explain what happens at each node before you run the code.</div>
+        <span class="badge badge-proj">Project</span>
+        <button class="complete-btn" data-complete="wk7" onclick="toggleComplete('wk7')" aria-pressed="false">Mark Complete</button>
+        <button class="recall-btn" data-recall="wk7" onclick="toggleRecall('wk7')" aria-expanded="false">🧠 Quick Recall</button>
+        <div class="recall-box" id="recall-wk7" aria-hidden="true">
+          <strong>🧠 Quick Recall</strong>
+          <ul>
+            <li>Why can't a single-layer network solve XOR?</li>
+            <li>What does a ReLU activation do? Draw it.</li>
+            <li>What does the universal approximation theorem say — and what does it NOT say?</li>
+          </ul>
+        </div>
+        <div class="career-box">
+          <strong>💼 Careers that need this</strong>
+          <ul><li>Deep Learning Engineer</li><li>Research Scientist</li><li>AI Software Engineer</li></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-num">08</span><span class="wk-tag">Unit 4</span></div>
+      <div class="cal-cell">
+        <div class="cell-title">Backpropagation: The Chain Rule</div>
+        <div class="cell-body">The most important algorithm in modern AI — fully demystified. Credit assignment across layers. Computational graphs. The engine of deep learning, exposed.</div>
+        <span class="badge badge-found">Foundational</span>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Forward + Backward Pass</div>
+        <div class="cell-body">Gradient accumulation. Automatic differentiation. Novice: visual diagram. Builder: NumPy full implementation. Architect: build mini-autograd from scratch (like Karpathy's micrograd).</div>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Lab: Handwritten Digit Recognizer</div>
+        <div class="cell-body">MNIST from scratch vs. PyTorch. Same results, different effort. Celebrate what the abstraction hides — and understand why it hides it.</div>
+        <span class="badge badge-proj">Project</span>
+        <button class="complete-btn" data-complete="wk8" onclick="toggleComplete('wk8')" aria-pressed="false">Mark Complete</button>
+        <button class="recall-btn" data-recall="wk8" onclick="toggleRecall('wk8')" aria-expanded="false">🧠 Quick Recall</button>
+        <div class="recall-box" id="recall-wk8" aria-hidden="true">
+          <strong>🧠 Quick Recall</strong>
+          <ul>
+            <li>Explain the chain rule applied to a 3-layer network without formulas.</li>
+            <li>What is a "vanishing gradient" — and which activation functions cause it?</li>
+            <li>What does PyTorch's autograd actually do for you?</li>
+          </ul>
+        </div>
+        <div class="career-box">
+          <strong>💼 Careers that need this</strong>
+          <ul><li>Computer Vision Engineer</li><li>ML Platform Engineer</li><li>Research Scientist</li></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- MIDTERM -->
+    <div class="cal-row" style="background:rgba(0,0,0,0.03);">
+      <div class="cal-wk"><span class="wk-num">09</span><span class="wk-tag">Midpoint</span></div>
+      <div class="cal-cell">
+        <div class="cell-title">Midterm Portfolio Exhibition</div>
+        <div class="cell-body">Not a test. A community showcase. Students present their first major project. Structured peer feedback. Written learning self-evaluation due. Celebrate progress.</div>
+        <span class="badge badge-exhibit">Exhibition</span>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Critical AI Panel Discussion</div>
+        <div class="cell-body">Guest practitioner (healthcare, education, or criminal justice tech). Class debates: "What should AI never be allowed to decide?" Structured Socratic discussion, not lecture.</div>
+        <span class="badge badge-crit">Critical</span>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Final Project Design Sprint</div>
+        <div class="cell-body">Students pitch final project ideas. Structured peer + instructor feedback using the 2-minute question protocol. Learning partnerships form around shared interests.</div>
+        <span class="badge badge-proj">Project</span>
+      </div>
+    </div>
+
+    <!-- UNIT 5 -->
+    <div class="cal-row">
+      <div class="cal-wk" style="background:rgba(10,124,110,0.06);"><span class="wk-tag">Unit 5</span></div>
+      <div class="cal-cell" colspan="3" style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--teal);padding:10px 20px;grid-column:2/-1;">
+        Unsupervised Learning + Natural Language Processing
+      </div>
+    </div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-num">10</span><span class="wk-tag">Unit 5</span></div>
+      <div class="cal-cell">
+        <div class="cell-title">Learning Without Labels</div>
+        <div class="cell-body">K-means clustering, PCA. What patterns exist in data that no human named? The power and danger of unsupervised discovery.</div>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Dimensionality & Meaning</div>
+        <div class="cell-body">The curse of dimensionality. Embeddings as compressed meaning. PCA as listening to the data's own story. Word vectors: the geometry of language.</div>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Lab: Cluster Your Playlist</div>
+        <div class="cell-body">K-means on Spotify audio features. Does the algorithm's grouping match your intuition? When it doesn't — why not? What does the model think "similarity" means?</div>
+        <span class="badge badge-proj">Project</span>
+      </div>
+    </div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-num">11</span><span class="wk-tag">Unit 5</span></div>
+      <div class="cal-cell">
+        <div class="cell-title">Natural Language Processing</div>
+        <div class="cell-body">Tokenization, TF-IDF, word2vec intuition. From bag-of-words to semantic embeddings. How machines read — and what they miss.</div>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Language as Power</div>
+        <div class="cell-body">Whose language is "standard"? AAVE, dialects, slang in NLP systems. Safiya Noble on bias in training data. This is not a soft topic — it is a precision engineering problem.</div>
+        <span class="badge badge-crit">Critical</span>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Project: Sentiment Analyzer</div>
+        <div class="cell-body">Train on Yelp reviews. Test on text from your community's language. Document every failure. Propose a technically grounded fix.</div>
+        <span class="badge badge-proj">Project</span>
+      </div>
+    </div>
+
+    <!-- UNIT 6 -->
+    <div class="cal-row">
+      <div class="cal-wk" style="background:rgba(227,100,20,0.06);"><span class="wk-tag">Unit 6</span></div>
+      <div class="cal-cell" colspan="3" style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--orange);padding:10px 20px;grid-column:2/-1;">
+        Computer Vision + Generative AI
+      </div>
+    </div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-num">12</span><span class="wk-tag">Unit 6</span></div>
+      <div class="cal-cell">
+        <div class="cell-title">Computer Vision</div>
+        <div class="cell-body">Convolutional neural networks. Filters, pooling, feature maps. How spatial pattern recognition works — from edge detection to object recognition.</div>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">What Machines See</div>
+        <div class="cell-body">Facial recognition + racial bias. Gender classification failures. Saliency maps: what is the model actually looking at? Buolamwini's "Gender Shades" as required reading.</div>
+        <span class="badge badge-crit">Critical</span>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Lab: Community Image Classifier</div>
+        <div class="cell-body">Classify local flora, community murals, or culturally meaningful objects. Test on edge cases you design. Document failures and hypothesize causes.</div>
+        <span class="badge badge-proj">Project</span>
+      </div>
+    </div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-num">13</span><span class="wk-tag">Unit 6</span></div>
+      <div class="cal-cell">
+        <div class="cell-title">Generative AI</div>
+        <div class="cell-body">How AI creates. GANs, VAEs, diffusion models (conceptual). The latent space as creative medium. Where does generative AI actually come from?</div>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Authorship, Consent, Labor</div>
+        <div class="cell-body">Who owns AI-generated art? Training data and consent. Displacement of creative workers. Class debates: should this technology exist in its current form?</div>
+        <span class="badge badge-crit">Critical</span>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Lab: Generate With Purpose</div>
+        <div class="cell-body">Create a generative tool with declared intent. Write a 500-word artist + engineer statement explaining your technical and ethical choices.</div>
+        <span class="badge badge-proj">Project</span>
+      </div>
+    </div>
+
+    <!-- UNIT 7 -->
+    <div class="cal-row">
+      <div class="cal-wk" style="background:rgba(193,18,31,0.06);"><span class="wk-tag">Unit 7</span></div>
+      <div class="cal-cell" colspan="3" style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--red);padding:10px 20px;grid-column:2/-1;">
+        Reinforcement Learning + LLMs + Alignment
+      </div>
+    </div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-num">14</span><span class="wk-tag">Unit 7</span></div>
+      <div class="cal-cell">
+        <div class="cell-title">Reinforcement Learning</div>
+        <div class="cell-body">Agents, environments, rewards, policies. Q-learning. The math of learning through consequence — like humans, but without empathy or self-preservation.</div>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Who Defines the Reward?</div>
+        <div class="cell-body">Reward hacking. Goodhart's Law. The alignment problem as a political problem. Every reward function is a value judgment. Who made that judgment?</div>
+        <span class="badge badge-crit">Critical</span>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Lab: Q-Learning Gridworld</div>
+        <div class="cell-body">Design your own reward function. Notice how your choices shape the agent's behavior. Reflect: what did you accidentally teach it to optimize for?</div>
+        <span class="badge badge-proj">Project</span>
+      </div>
+    </div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-num">15</span><span class="wk-tag">Unit 7</span></div>
+      <div class="cal-cell">
+        <div class="cell-title">Large Language Models</div>
+        <div class="cell-body">Transformers, self-attention, pre-training + fine-tuning. How ChatGPT actually works — at the architecture level, not the PR level.</div>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Hallucination, Truth, Power</div>
+        <div class="cell-body">Why LLMs confabulate. Epistemic authority without accountability. Concentrated AI power. Required: Bender et al., "On the Dangers of Stochastic Parrots."</div>
+        <span class="badge badge-crit">Critical</span>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Lab: Red-Team an LLM</div>
+        <div class="cell-body">Systematically probe for biases and failure modes. Document findings. Builder/Architect: fine-tune a small model. Write a technical safety audit report.</div>
+        <span class="badge badge-proj">Project</span>
+      </div>
+    </div>
+
+    <!-- UNIT 8 + FINAL -->
+    <div class="cal-row" style="background:rgba(0,0,0,0.03);">
+      <div class="cal-wk"><span class="wk-num">16</span><span class="wk-tag">Unit 8</span></div>
+      <div class="cal-cell">
+        <div class="cell-title">AI Ethics & Governance</div>
+        <div class="cell-body">Algorithmic fairness definitions — and why they conflict mathematically. Explainability, accountability. EU AI Act, California proposals.</div>
+        <span class="badge badge-crit">Critical</span>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Navigate vs. Transform</div>
+        <div class="cell-body">Jeff Anderson's framework: how do you navigate harmful systems without internalizing oppression? As a future AI practitioner, what will you uphold — and what will you transform?</div>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Final Project Studio Time</div>
+        <div class="cell-body">Dedicated studio time. Learning conference check-ins. Peer feedback sessions. Document your process, not just your product.</div>
+        <span class="badge badge-proj">Project</span>
+      </div>
+    </div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-num">17</span><span class="wk-tag">Final</span></div>
+      <div class="cal-cell">
+        <div class="cell-title">Final Exhibition — Day 1</div>
+        <div class="cell-body">Community showcase. Each student presents: what they built, what they learned, what they'd change. Not a performance — a conversation with peers and guests.</div>
+        <span class="badge badge-exhibit">Exhibition</span>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Learning Conferences</div>
+        <div class="cell-body">Individual meetings: you present your portfolio and assign your own grade with evidence. Instructor reviews for completeness and provides final feedback.</div>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Portfolio Due</div>
+        <div class="cell-body">All projects, reflections, concept notes, and final learning self-evaluation. You assign your grade. Evidence required.</div>
+      </div>
+    </div>
+
+    <div class="cal-row">
+      <div class="cal-wk"><span class="wk-num">18</span><span class="wk-tag">Finale</span></div>
+      <div class="cal-cell">
+        <div class="cell-title">Final Exhibition — Day 2</div>
+        <div class="cell-body">Remaining presentations. Community celebration. Reflection on what this class leaves with you — and what you leave behind in it.</div>
+        <span class="badge badge-exhibit">Exhibition</span>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Where Do You Go From Here?</div>
+        <div class="cell-body">Transfer pathways. Careers in ethical AI. Organizations doing justice-focused tech work. You are now a practitioner. Act like one.</div>
+      </div>
+      <div class="cal-cell">
+        <div class="cell-title">Course Co-Evaluation</div>
+        <div class="cell-body">You evaluate the course, instructor, and your own growth. Your feedback co-creates the next version of this class. This is Freire's dialogic education made real.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- UNGRADING -->
+<hr class="section-rule">
+<section id="assessment">
+  <div class="section-tag">Assessment</div>
+  <h2>You Assign Your Grade.<br><em>Here's Why.</em></h2>
+  <p class="lead">
+    Adapted from Jeff Anderson's ungrading practice, grounded in research showing traditional grading harms learning. We don't optimize for grades. We optimize for real mastery you can use in your career and community.
+  </p>
+
+  <div class="ungrading">
+    <div class="ungrade-left">
+      <h3>Your Learning Portfolio</h3>
+      <p style="font-size:14px;line-height:1.75;color:rgba(245,240,232,0.65);margin-bottom:20px;">
+        Your portfolio is evidence of your learning journey — not a finished showcase, but a process document. First attempts, failures, revised understanding, growth moments. Include everything.
+      </p>
+      <ul class="ungrade-list">
+        <li>Concept notes for every major idea, in your language + technical language</li>
+        <li>All project code with documented thinking, not just clean code</li>
+        <li>Critical essays: who built this, for whom, and what should change?</li>
+        <li>Bi-weekly learning reflections</li>
+        <li>Mid-term and final learning self-evaluation</li>
+        <li>Evidence of peer teaching + peer feedback given</li>
+        <li>Your "Conquering College" activities: meta-learning about how you learn</li>
+      </ul>
+    </div>
+    <div class="ungrade-right">
+      <h3>Three Feedback Sources</h3>
+      <p style="font-size:14px;line-height:1.75;color:var(--dim);margin-bottom:20px;">
+        You receive feedback from three sources, not one. The instructor is the smallest. This mirrors professional practice in tech.
+      </p>
+      <ul class="ungrade-list">
+        <li><strong>Self-Directed:</strong> Check your implementations against first principles. Use the 2-minute question rule. Document your own errors and corrections.</li>
+        <li><strong>Peer-to-Peer:</strong> Learning partnerships (2 people) and learning groups (4–5) meet weekly. You teach each other. Teaching is the deepest learning.</li>
+        <li><strong>Instructor Conferences:</strong> Every 2 weeks, your group presents portfolio progress. 15–20 min. Targeted, specific feedback. Not a grade — a coaching session.</li>
+        <li><strong>You Assign Your Grade:</strong> Final self-evaluation with evidence. If you've done the work deeply and honestly, you earn an A. You present the case for it.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- HOW TO SUCCEED -->
+<section class="succeed-section" id="succeed" aria-label="How to Succeed">
+  <div class="section-tag">Learning Strategy</div>
+  <h2>How to Succeed <em>in This Course</em></h2>
+  <p class="lead" style="max-width:720px;">
+    These aren't productivity hacks. They're how people actually learn hard technical material — especially first-generation students navigating a field that wasn't designed with them in mind.
+  </p>
+  <div class="succeed-grid">
+    <div class="succeed-card">
+      <div class="succeed-num">01</div>
+      <div class="succeed-title">Trace Before You Run</div>
+      <p class="succeed-body">Before running any code, trace through it by hand on paper with 3 small inputs. Predict the output. Amy Ko's research: this is the single highest-leverage learning habit in CS.</p>
+    </div>
+    <div class="succeed-card">
+      <div class="succeed-num">02</div>
+      <div class="succeed-title">Teach One Thing Weekly</div>
+      <p class="succeed-body">Explain one concept to a classmate, family member, or rubber duck every week. If you can't explain it plainly, you don't understand it yet. Teaching reveals the gaps that practice hides.</p>
+    </div>
+    <div class="succeed-card">
+      <div class="succeed-num">03</div>
+      <div class="succeed-title">Reduce to 3 Elements</div>
+      <p class="succeed-body">When stuck on an algorithm, shrink the problem. n=3 instead of n=100. Draw it. The bug is almost always visible at small scale. Don't reach for debugging tools before reaching for paper.</p>
+    </div>
+    <div class="succeed-card">
+      <div class="succeed-num">04</div>
+      <div class="succeed-title">Write Before You Search</div>
+      <p class="succeed-body">Before using ChatGPT or Stack Overflow, write your precise confusion: what you understand, what step breaks, what you've tried. That writing is the learning. The answer is secondary.</p>
+    </div>
+    <div class="succeed-card">
+      <div class="succeed-num">05</div>
+      <div class="succeed-title">Read the Error, Don't Flee It</div>
+      <p class="succeed-body">Error messages are AI's way of pointing exactly at the problem. Read the full error. Find the line number. Read the surrounding code. 80% of bugs announce themselves clearly — if you look.</p>
+    </div>
+    <div class="succeed-card">
+      <div class="succeed-num">06</div>
+      <div class="succeed-title">Discomfort Is Data</div>
+      <p class="succeed-body">Confusion doesn't mean you're behind — it means you're at the edge of your current model. Write down exactly what's confusing. That specificity is expertise in formation. Then bring it to class.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- CONCEPT MAP -->
+<section class="concept-map-section" id="concept-map" aria-label="How concepts connect">
+  <div class="section-tag">How It All Connects</div>
+  <h2>The Concept <em>Map</em></h2>
+  <p class="lead" style="max-width:720px;">
+    AI isn't a collection of isolated tools — it's a web of ideas that build on each other. Here's how every major concept in this course connects.
+  </p>
+  <div class="concept-flows">
+    <div class="concept-flow">
+      <div class="concept-flow-label">Foundation Layer</div>
+      Probability + Statistics<br>
+      <span class="arrow">↓</span> Bayes Theorem<br>
+      <span class="arrow">↓</span> Maximum Likelihood<br>
+      <span class="arrow">↓</span> Everything Else
+    </div>
+    <div class="concept-flow">
+      <div class="concept-flow-label">Search + Optimization</div>
+      State Space Search<br>
+      <span class="arrow">↓</span> BFS / DFS / A*<br>
+      <span class="arrow">↓</span> Minimax<br>
+      <span class="arrow">↓</span> Gradient Descent
+    </div>
+    <div class="concept-flow">
+      <div class="concept-flow-label">Learning</div>
+      Loss Function<br>
+      <span class="arrow">↓</span> Linear → Logistic<br>
+      <span class="arrow">↓</span> Perceptron → MLP<br>
+      <span class="arrow">↓</span> Backpropagation
+    </div>
+    <div class="concept-flow">
+      <div class="concept-flow-label">Representation</div>
+      Unsupervised Learning<br>
+      <span class="arrow">↓</span> K-Means / PCA<br>
+      <span class="arrow">↓</span> Word Embeddings<br>
+      <span class="arrow">↓</span> CNNs / Transformers
+    </div>
+    <div class="concept-flow">
+      <div class="concept-flow-label">Modern AI</div>
+      Language Models<br>
+      <span class="arrow">↓</span> Self-Attention<br>
+      <span class="arrow">↓</span> Reinforcement Learning<br>
+      <span class="arrow">↓</span> Alignment + Governance
+    </div>
+    <div class="concept-flow">
+      <div class="concept-flow-label">Critical Thread</div>
+      Who builds it?<br>
+      <span class="arrow">↓</span> Who benefits?<br>
+      <span class="arrow">↓</span> Who is harmed?<br>
+      <span class="arrow">↓</span> What should change?
+    </div>
+  </div>
+</section>
+
+
+<!-- DATASETS -->
+<section class="datasets-section" id="datasets" aria-label="Real datasets for practice">
+  <div class="section-tag">Real Data</div>
+  <h2>Practice with <em>Real Datasets</em></h2>
+  <p class="lead" style="max-width:720px;">
+    Every project in this course can be applied to real data that matters — not iris flowers and toy examples. These datasets are curated to connect technical learning to real-world consequence.
+  </p>
+  <div class="dataset-grid">
+    <div class="dataset-item">
+      <div class="dataset-name">ProPublica COMPAS</div>
+      <p class="dataset-desc">Recidivism prediction scores used in US courts. Foundational for bias auditing — used in Machine Bias investigation.</p>
+      <a class="dataset-link" href="https://github.com/propublica/compas-analysis" target="_blank" rel="noopener">→ Get Dataset</a>
+    </div>
+    <div class="dataset-item">
+      <div class="dataset-name">Census Income (UCI)</div>
+      <p class="dataset-desc">Predict whether income &gt;50K. Exposes class, race, and gender disparities in feature importance. Classic fairness benchmark.</p>
+      <a class="dataset-link" href="https://archive.ics.uci.edu/dataset/2/adult" target="_blank" rel="noopener">→ Get Dataset</a>
+    </div>
+    <div class="dataset-item">
+      <div class="dataset-name">Bay Area Transit Data</div>
+      <p class="dataset-desc">BART and AC Transit ridership by station. Build a graph-based recommendation system or route optimizer.</p>
+      <a class="dataset-link" href="https://511.org/open-data/transit" target="_blank" rel="noopener">→ Get Dataset</a>
+    </div>
+    <div class="dataset-item">
+      <div class="dataset-name">Hate Speech (Davidson et al.)</div>
+      <p class="dataset-desc">Tweets labeled hate speech, offensive, or neither. Useful for NLP classification and studying labeling bias in training data.</p>
+      <a class="dataset-link" href="https://github.com/t-davidson/hate-speech-and-offensive-language" target="_blank" rel="noopener">→ Get Dataset</a>
+    </div>
+    <div class="dataset-item">
+      <div class="dataset-name">Facial Recognition Audit Data</div>
+      <p class="dataset-desc">Joy Buolamwini's Gender Shades benchmark. Exposes intersectional bias in commercial facial analysis systems.</p>
+      <a class="dataset-link" href="http://gendershades.org" target="_blank" rel="noopener">→ Learn More</a>
+    </div>
+    <div class="dataset-item">
+      <div class="dataset-name">NLTK Brown Corpus</div>
+      <p class="dataset-desc">One million+ words from 500 English texts across 15 genres. Free, built into NLTK. Excellent for NLP and language analysis.</p>
+      <a class="dataset-link" href="https://www.nltk.org/book/ch02.html" target="_blank" rel="noopener">→ Get Dataset</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- BADGES -->
+<section class="badges-section" id="badges" aria-label="Mastery badges">
+  <div class="section-tag" style="color:var(--gold)">Mastery</div>
+  <h2>Earn Your<br>Algorithm Badge</h2>
+  <p class="lead">Complete units to unlock badges. They're tracked locally in your browser — a record of your journey, not a grade.</p>
+  <div class="badge-grid">
+    <div class="badge-item" id="badge-explorer" aria-label="AI Explorer — complete 3+ projects">
+      <span class="badge-icon">🌱</span>
+      <div class="badge-name">AI Explorer</div>
+      <div class="badge-status">Complete 3+ units</div>
+    </div>
+    <div class="badge-item" id="badge-builder" aria-label="AI Builder — complete 6+ projects">
+      <span class="badge-icon">🔨</span>
+      <div class="badge-name">AI Builder</div>
+      <div class="badge-status">Complete 6+ units</div>
+    </div>
+    <div class="badge-item" id="badge-architect" aria-label="AI Architect — complete all projects">
+      <span class="badge-icon">🔬</span>
+      <div class="badge-name">AI Architect</div>
+      <div class="badge-status">Complete all 9 units</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-title">CS <span>180</span><br>Intro to AI</div>
+      <div class="footer-sub">
+        Foothill College · West Valley College<br>
+        3 Units · 18 Weeks · Flipped + Project-Based<br>
+        Liberatory Education · Ungrading · Community-Centered
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Informed By</h4>
+      <ul>
+        <li>Dr. Amy J. Ko — UW iSchool</li>
+        <li>Jeff Anderson — Syllabus Design</li>
+        <li>Paulo Freire — Liberatory Pedagogy</li>
+        <li>bell hooks — Teaching to Transgress</li>
+        <li>Joy Buolamwini — Gender Shades</li>
+        <li>Safiya Noble — Algorithms of Oppression</li>
+        <li>Ruha Benjamin — Race After Technology</li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Free Resources</h4>
+      <ul>
+        <li>AI: A Modern Approach (library)</li>
+        <li>fast.ai — Practical Deep Learning</li>
+        <li>3Blue1Brown — Neural Networks</li>
+        <li>Stanford CS229 Lecture Notes</li>
+        <li>Google Colab (no install needed)</li>
+        <li>Teachable Machine (Novice track)</li>
+        <li>Hugging Face — LLM exploration</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>CS 180 — Introduction to Artificial Intelligence</span>
+    <span>All resources free and open-access. No required textbook to purchase.</span>
+  </div>
+</footer>
+
+<script src="js/progress.js"></script>
+</body>
+</html>
